@@ -34,3 +34,11 @@ body.reader-enabled *{box-sizing:border-box}
 @media(max-width:1000px){.reader-layout{grid-template-columns:minmax(0,1fr) 210px;gap:18px}.reader-toc a{font-size:12px}}
 @media(max-width:760px){.reader-layout{display:block;padding:22px 17px 90px}.reader-toc{display:none}.reader-mobile-toc{display:block;position:sticky;top:67px;z-index:85;margin:0 0 22px}.reader-mobile-toc summary{cursor:pointer;background:#272d35;border:1px solid #47505b;border-radius:9px;padding:9px 13px;font-size:14px;list-style:none}.reader-mobile-toc[open]{background:#1b1f25;border-radius:9px;border:1px solid #47505b;padding-bottom:10px}.reader-mobile-toc[open] summary{border:0;background:transparent}.reader-mobile-toc a{display:block;color:#cdd7df!important;text-decoration:none!important;padding:7px 14px;font-size:13px}.reader-top{padding:0 14px}.reader-brand{font-size:13px}.reader-actions .reader-btn{font-size:12px;padding:7px 8px!important}.reader-floating{right:12px;bottom:12px}.reader-floating .reader-btn{font-size:12px!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.reader-progress{transition:none}}
+
+/* Audit remediation: keep horizontal scrolling inside tables and long mobile TOCs. */
+.reader-table-scroll{max-width:100%;width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin:14px 0}
+.reader-table-scroll table{margin:0;min-width:500px}
+.reader-main{min-width:0;overflow-wrap:anywhere}
+.reader-main .answer,.reader-main .bodytext{min-width:0}
+.reader-main .reader-table-scroll{overflow-wrap:normal}
+@media(max-width:760px){.reader-mobile-toc[open]{max-height:calc(100dvh - 92px);overflow-y:auto}.reader-top{min-width:0}.reader-top .reader-actions{flex-shrink:0}}
