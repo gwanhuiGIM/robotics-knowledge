@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M0609 액체 운반 프로젝트: 학사·비전공자 팀 역량과 모집 기준 | Robotics Knowledge Lab</title>
+<meta name="description" content="두산 M0609 액체 운반·슬로싱 억제 프로젝트에 참여할 학사·비전공자 지원자의 최소 역량과 원활한 개발 수준, 역할 및 검증 과제">
+<link rel="stylesheet" href="../assets/reader.css">
+<style>:root{color-scheme:dark}*{box-sizing:border-box}body{font:16px/1.8 system-ui,-apple-system,"Noto Sans KR",sans-serif;color:#eceef0;background:#111318;max-width:1040px;margin:auto;padding:26px 22px}a{color:#c9dbea}p,li{color:#cbd2d9}h1{font-size:clamp(26px,4vw,38px);line-height:1.3}h2{margin-top:35px;padding-top:24px;border-top:1px solid #3e454e}h3{margin-top:25px}.meta{color:#aab4bf;font-size:13px}.panel{background:#1b2027;border:1px solid #414a54;border-radius:12px;padding:20px;margin:18px 0}.question{background:#282f38;border-left:4px solid #c8d1dc;padding:14px;white-space:pre-wrap}.tablewrap{overflow:auto;max-width:100%}table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}th,td{padding:12px;border:1px solid #49525d;text-align:left;vertical-align:top}th{background:#303944}code{font-family:ui-monospace,monospace;background:#303944;padding:2px 5px;border-radius:4px}.level{border-left:3px solid #738eaf;padding:8px 15px;margin:12px 0;background:#20262f}.note{font-size:13px;color:#aeb8c3}footer{color:#a9b3be;font-size:13px;padding:35px 0}</style>
+</head><body>
+<a href="../index.html">← Robotics Knowledge Lab</a>
+<p class="meta">ROBOT CONTROL · M0609 · 프로젝트 기획/역량 평가 · 2026-11-03</p>
+<h1>M0609 액체 운반 프로젝트: 학사·비전공자 팀의 최소 역량과 원활한 개발 수준</h1>
+<p>협동로봇 관절 토크 추정, 중력 보상, 수평 자세 유지, 액체 슬로싱 억제를 다루는 프로젝트에서 신입 학사 및 로보틱스 비전공자가 맡을 수 있는 범위와 필요한 최소 실습 역량을 구분한다.</p>
+<section class="panel"><strong>사용자 질문 원문</strong>
+<p class="question">학사지원자들, 이공계 비전공자들이 진행할 수 있을까 ㅋㅋ? 프로젝트 구현에 참가하게 될 지원자들의 최소 수준. 원활한 수준을 말해줘</p>
+<p class="meta">아래 본문은 이 질문에 대한 답변을 기술 문서 형식으로 재구성한 학습 해설이다. 원래 대화의 인터랙티브 체크리스트와 UI를 그대로 복제한 것은 아니다. 선행 대화의 기술적 배경도 요약했으며, 다른 질문·답변의 전문 전사본이라고 주장하지 않는다.</p></section>
+<h2>1. 결론: 학사·비전공자도 가능하지만 범위 조정이 필수</h2>
+<p><strong>참여 자체는 충분히 가능하다.</strong> 다만 Python·ROS2·로봇 제어 경험이 없는 3~4명이 처음부터 능동 슬로싱 억제나 MPC를 독자 개발하는 것은 지나치게 어려울 수 있다. 8~12주 일정은 ROS2와 실기기 제어를 주도할 수 있는 사람이 최소 1명 이상 있다는 가정이 필요하다.</p>
+<p>모든 팀원이 제어이론을 숙달할 필요는 없다. 기계·전기·컴퓨터·타 이공계 전공자가 각각 기구 설계, SW 통합, 궤적 계획, 계측 및 데이터 분석을 분담할 수 있다.</p>
+<h2>2. 기술별 최소 수준과 원활한 수준</h2>
+<div class="tablewrap"><table><thead><tr><th>역량</th><th>최소 참여 수준</th><th>원활한 개발 수준</th></tr></thead><tbody><tr><td>Python</td><td>변수·함수·반복문 및 파일 입출력</td><td>NumPy/Matplotlib로 CSV 분석·디버깅</td></tr><tr><td>Linux/Git</td><td>명령어로 프로젝트 실행·기록</td><td>패키지 환경 문제 해결, 브랜치·PR 활용</td></tr><tr><td>ROS2</td><td>노드·토픽·메시지의 역할 이해</td><td>pub/sub·서비스·rosbag2·로그 활용</td></tr><tr><td>수학</td><td>벡터·삼각함수·기본 미분</td><td>행렬·좌표변환·미분방정식 기초</td></tr><tr><td>역학</td><td>힘·모멘트·속도·가속도</td><td>회전·관성·중력 보상 이해</td></tr><tr><td>제어</td><td>피드백의 개념</td><td>PID, S-curve, 가속도·저크 제한</td></tr><tr><td>로봇</td><td>관절·TCP·BASE/TOOL 구별</td><td>FK/IK, Jacobian, 프레임 변환</td></tr><tr><td>시험평가</td><td>실험 기록·기본 그래프</td><td>반복실험, 시간 동기화, 오차·진동 분석</td></tr></tbody></table></div>
+<p>최소 요건은 모든 분야를 고르게 잘하는 능력이 아니라 <strong>Python 기초 또는 CAD·계측·데이터 정리 중 한 분야의 수행 능력</strong>, 기초 역학 이해, 실험 과정의 기록 및 공유 능력이다. 로봇 안전 운용은 별도 숙련자 감독 아래 수행해야 한다.</p>
+<h2>3. 지원자별 역량 단계 및 가능한 업무</h2>
+<div class="level"><h3>Level 0 — 로보틱스 경험 없음</h3><p>실험 환경 구축·트레이 제작 보조·영상 촬영·실험 데이터 정리·문서화부터 참여 가능. 핵심 로봇 제어 코드 개발은 사전 교육이 필요하다.</p></div>
+<div class="level"><h3>Level 1 — 기초 활용</h3><p>Python에서 센서값을 읽고 그래프를 만들거나, 제공된 ROS2 예제를 수정하고 단순 로봇 이동 명령을 수행하는 수준. 기능별 보조 개발과 데이터 처리 담당에 적합하다.</p></div>
+<div class="level"><h3>Level 2 — 독립 구현</h3><p>ROS2 노드 작성·통합, M0609 상태값과 TCP 처리, 로깅, 궤적 생성 및 파라미터 시험을 독립적으로 수행하는 수준. 로봇 SW·통합 개발 주담당에 적합하다.</p></div>
+<div class="level"><h3>Level 3 — 연구·고급 제어</h3><p>로봇 동역학, 신호처리, Input Shaping, 상태추정·최적화 등을 바탕으로 새 알고리즘을 설계하고 시험하는 수준. 능동 슬로싱 제어 개발 담당에 적합하다.</p></div>
+<h2>4. 팀 구성과 예상 기간</h2>
+<div class="tablewrap"><table><thead><tr><th>4인 팀 구성</th><th>현실적인 산출물</th><th>예상 기간</th></tr></thead><tbody>
+<tr><td>Level 0 × 4</td><td>사전교육, 예제 실행, 단순 트레이 운반</td><td>12~20주 이상</td></tr><tr><td>Level 1 × 4</td><td>TCP 수평 운반, 저속 실험, 데이터 수집</td><td>10~16주</td></tr><tr><td>Level 2 × 1 + Level 1 × 3</td><td>가감속 궤적 비교, 액체 흔들림 계측·분석</td><td>8~12주</td></tr><tr><td>Level 2 × 3 + Level 3 × 1</td><td>슬로싱 억제 알고리즘 구현과 실험 검증</td><td>8~16주</td></tr></tbody></table></div>
+<p class="note">기간은 공식 산업 평균이 아닌 작업 범위에 대한 추정이다. 주당 15~25시간 참여, M0609 및 제어기·개발 PC 확보, 담당자의 안전 지도 가능을 가정한다. 초보 팀만으로 진행할 경우 일정의 불확실성이 크다.</p>
+<p><strong>추천 최소 팀:</strong> Level 2 1명 + Level 1 2명 + Level 0~1 1명. 네 사람 중 최소 1명은 실기기 제어·ROS2 통합을 주도해야 하며, 장비 운용은 교육받은 감독자 관리 아래 수행한다.</p>
+<h2>5. 모집 시 확인할 실습 과제</h2>
+<div class="tablewrap"><table><thead><tr><th>항목</th><th>실습 과제</th><th>분류</th></tr></thead><tbody>
+<tr><td>Python 기초</td><td>시간·가속도 CSV를 읽어 그래프 작성</td><td>최소</td></tr><tr><td>기초 역학</td><td>1kg 하중이 0.2m 떨어진 위치에 있을 때 모멘트 계산과 의미 설명</td><td>최소</td></tr><tr><td>Linux/Git</td><td>저장소 복제·실행·오류 기록</td><td>원활</td></tr><tr><td>ROS2</td><td>Publisher / Subscriber 노드 작성·실행</td><td>원활</td></tr><tr><td>좌표계</td><td>BASE와 TOOL 기준 힘 방향 차이 설명</td><td>원활</td></tr><tr><td>시험 설계</td><td>두 이동 궤적의 흔들림을 비교할 실험 계획 수립</td><td>원활</td></tr></tbody></table></div>
+<p>이 평가표는 교육 및 역할 배정용이며 실제 로봇 운용 자격 판정표는 아니다. 한 항목을 못한다고 전체 프로젝트 참여가 불가능한 것은 아니다.</p>
+<h2>6. 범위 확장: 필수 → 권장 → 도전</h2>
+<ol><li><strong>필수:</strong> 트레이가 수평으로 이동하도록 TCP 목표 자세와 로봇의 허용 속도·가속도를 설정하고, 물의 흔들림을 영상이나 측정값으로 기록한다.</li>
+<li><strong>권장:</strong> 일반 가감속과 5차 다항식·S-curve 등의 궤적을 비교해 진동·이송 시간의 개선 여부를 검증한다.</li>
+<li><strong>도전:</strong> Input Shaping, 액면 상태 추정, 필요시 능동 용기 기울기 제어로 흔들림을 추가 억제한다.</li></ol>
+<p>고급 알고리즘이 완성되지 않아도 <strong>Baseline 실험 + 개선 궤적 + 반복 측정</strong>을 확보하면 충분히 의미 있는 학부 프로젝트가 된다.</p>
+<h2>7. 기술 배경: M0609 관절 토크 센싱과 액체 운반의 차이</h2>
+<p>M0609의 관절 토크 측정값과 동역학 모델을 이용하면 외력에 의한 관절 토크를 추정하고, 로봇의 자코비안 전치행렬을 통해 TCP의 힘·모멘트와 관계 지을 수 있다. 하지만 중력 보상은 하중을 지탱하는 제어의 일부이며, TCP 수평 자세를 자동 보장하지 않는다. 또한 트레이가 수평이어도 급가속·급정지 시 액체가 출렁일 수 있다.</p>
+<p>따라서 기구 고정과 유출 보호, 저가속·저저크 경로, 자세 제어, 필요시 추가 액면 계측을 결합해야 한다. 관절 토크만으로 액체 표면 상태를 직접 관측할 수 없으며, 이미지에서 제시한 '중력 보상 없음 = 필연적 트레이 기울어짐'은 물리적으로 일반화할 수 없다.</p>
+<h2>8. 협업 분담과 제출물</h2>
+<div class="tablewrap"><table><thead><tr><th>역할</th><th>핵심 담당</th><th>제출물</th></tr></thead><tbody>
+<tr><td>로봇 SW·통합</td><td>ROS2, M0609 통신, 실행 상태 관리</td><td>노드·실행 구성·로그</td></tr><tr><td>제어/경로</td><td>TCP 자세, S-curve, 가속도 제한</td><td>궤적 코드·비교 결과</td></tr><tr><td>기구/안전</td><td>트레이·장착부·CoM·유출 보호</td><td>CAD·조립 도면·안전 점검</td></tr><tr><td>시험평가</td><td>카메라·IMU(선택), 흔들림 추적, 반복 실험</td><td>CSV·분석 그래프·검증 보고서</td></tr></tbody></table></div>
+<h2>9. 결론과 제한사항</h2>
+<p>지원자에게 처음부터 자코비안 역연산, 전체 동역학 모델, MPC를 요구하지 말고 공식 M0609 제어기의 검증된 기능을 활용하도록 한다. 팀은 <strong>안전한 궤적 생성, 데이터 계측, 정량적 검증</strong>에 집중하는 것이 가장 현실적이다. 장비·인력·시험 환경에 따라 일정은 달라진다.</p>
+<h2>참고 자료</h2>
+<ul><li><a href="https://github.com/DoosanRobotics/doosan-robot2">Doosan Robotics 공식 ROS2 저장소</a></li>
+<li><a href="https://docs.ros.org/en/humble/">ROS2 Humble 공식 문서</a></li>
+<li><a href="https://docs.ros.org/en/humble/Tutorials/Intermediate/Recording-A-Bag-From-Your-Own-Node-CPP.html">ROS2 rosbag 기록 안내</a></li></ul>
+<footer>출처 표기: 사용자 질문은 원문, 본문은 대화 기반 재구성 · 예상 기간/난이도/모집 기준은 실험적 기획 판단(공식 통계 아님).<br>확신도: 추론 · 내가 채워넣은 가정: 4인 팀, 주당 15~25시간, 기본 장비 확보 · 확인 요청: 없음</footer>
+<script defer src="../assets/reader.js"></script></body></html>
