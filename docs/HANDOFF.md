@@ -22,3 +22,23 @@ Build a growing Korean robotics study archive from ChatGPT Q&A. The highest prio
 12. The user asked whether the handoff exists and for this session's intent and exchange history to be recorded. This document addresses that request.
 
 This is a curated paraphrased history, not a full original transcript. Never present it as a replacement for source Q&A.
+
+## Operational source of truth and current structure
+- Repository: https://github.com/gwanhuiGIM/robotics-knowledge
+- Site: https://gwanhuigim.github.io/robotics-knowledge/
+- index.html: articles, categories, keyword search
+- articles/: the published pages (some older material explicitly reconstructed, not original transcript)
+- assets/reader.css and assets/reader.js: shared navigation and reading interface
+- .github/workflows/static.yml: Pages deployment on main
+- AGENTS.md: invariant agent rules; docs/OPERATIONS.md: operational procedure; docs/HANDOFF.md: current decisions/status
+
+### Scheduled ingestion
+Previously configured task: Robotics Knowledge Lab 게시 자동화, ID 6a95f0a1d2048191b0cdc1f9aa03eedd. At last confirmed setup it uses Asia/Seoul 00:00, 12:00, 15:00, 18:00. Input is the existing Notion Idea Inbox - GPT data source; an explicit '사이트 게시 | 질문' request authorizes a newly generated explanatory answer and site publication. Preserve existing answer only if its actual full text is available. Check duplicate articles and public data risks, then update article, index and original Notion request with result. Always re-check the automation's active configuration; success of configuration changes does not prove successful end-to-end scheduled publication.
+
+### Verification and future collaboration
+- Confirm local git clone, branch and dirty state on the user's machine separately. Remote GitHub inspection cannot verify these.
+- Check category/search empty results, TOC anchors, back/top buttons, mobile widths 360/390/760px, source accuracy, external references, GitHub deployment and actual rendered page.
+- Suggested future work, not implemented merely by this document: preserve original source in content files, separate metadata, shared rendering templates, automated regression tests, controlled Notion-to-GitHub dry run.
+- Local and web agents should operate on separate branches/PRs where practical, refresh current state before writing to shared files, and record verified work plus uncertainties. Never rewrite user Q&A merely to polish layout.
+
+Updated: 2026-11-03. This update documents decisions only; it does not establish a successful browser or scheduled-job test.
