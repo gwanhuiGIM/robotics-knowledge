@@ -1,6 +1,6 @@
 # Robotics Knowledge Lab — Agent Instructions
 
-> Applies to Codex, Claude Code, ChatGPT Work, and other AI/software agents working in this repository. Read [docs/OPERATIONS.md](docs/OPERATIONS.md) before modifying published content.
+> Applies to Codex, Claude Code, ChatGPT Work, and other AI/software agents working in this repository. Read [docs/OPERATIONS.md](docs/OPERATIONS.md) and [docs/HANDOFF.md](docs/HANDOFF.md) before modifying published content.
 
 ## Mission and priority
 
@@ -46,4 +46,4 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 
 ## Handoff
 
-Read [docs/OPERATIONS.md](docs/OPERATIONS.md) for the background, two user entry routes, scheduled automation, audit findings, acceptance tests, and future architecture. If those instructions conflict with a current explicit user instruction, obey the user, note the conflict, and preserve source data.
+Read [docs/HANDOFF.md](docs/HANDOFF.md) for recent user intentions and decisions, and [docs/OPERATIONS.md](docs/OPERATIONS.md) for the background, two user entry routes, scheduled automation, audit findings, acceptance tests, and future architecture. If those instructions conflict with a current explicit user instruction, obey the user, note the conflict, and preserve source data.
