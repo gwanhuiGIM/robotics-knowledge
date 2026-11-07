@@ -50,6 +50,7 @@ source_note: "출처: …"             # 선택 — 글 맨 아래 출처 문구
 
 - 답변 전체가 아니라 **일부 시각자료만** 다시 그렸다면 글 전체의 값은 바꾸지 않고, 그 그림 앞에 `> [!WARNING]`으로 "재구성 시각자료"임을 적는다.
 - 확보하지 못한 원문을 원문처럼 쓰지 않는다(AGENTS.md 규칙 2·3).
+- **기존 답변 원문을 게시해 달라는 요청**인데 원문을 확보하지 못했다면 `reconstructed`로 바꿔 게시하지 않는다. 게시를 멈추고 확인을 요청한다(OPERATIONS.md 3절 B, Notion 요청이면 `확인 필요`).
 
 ## 5. 본문 구조
 
@@ -113,5 +114,5 @@ python3 -m http.server 8799 --directory _site   # 브라우저로 http://127.0.0
 
 ```text
 사이트 게시 요청을 받으면 GitHub 저장소 gwanhuiGIM/robotics-knowledge의 docs/AUTHORING.md와 AGENTS.md를 connector로 먼저 읽고 그대로 따른다.
-글은 content/<slug>.md(Markdown 원문 + front matter)로만 커밋하고, index.html이나 articles/*.html을 직접 만들거나 고치지 않는다.
+새 글은 content/<slug>.md(Markdown 원문 + front matter)로만 커밋한다. 새 글을 articles/*.html로 만들거나 홈 카드(tools/templates/index.html, tools/legacy_cards.yml)를 직접 고치지 않는다. 기존 HTML 글의 수정은 사용자가 요청했을 때만 AGENTS.md 규칙대로 한다.
 ```

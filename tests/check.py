@@ -62,6 +62,9 @@ def site_check(out):
         check((out / h).is_file(), f"카드 링크 대상 없음: {h}")
     for md in (ROOT / "content").glob("*.md"):
         p = out / "articles" / f"{md.stem}.html"
+        # 총수만 맞는 거짓 PASS를 막는다: content 글마다 페이지와 홈 카드가 각각 있어야 한다.
+        check(p.is_file(), f"생성 글 없음(빌드에서 제외됐을 수 있음): {p.name}")
+        check(f"articles/{md.stem}.html" in hrefs, f"홈 카드 없음: {md.stem}")
         if p.is_file():
             t = p.read_text(encoding="utf-8")
             check("../assets/reader.js" in t and "../assets/reader.css" in t, f"reader 자산 누락: {p.name}")

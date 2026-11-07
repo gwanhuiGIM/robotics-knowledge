@@ -12,7 +12,7 @@ import html
 import re
 import shutil
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from string import Template
 
@@ -164,11 +164,17 @@ def split_front_matter(text, path):
 
 
 def as_date(v, field):
+    # YAML은 2026-11-07을 date로, 시각이 붙으면 datetime으로 읽는다 — 날짜만 허용한다.
+    if isinstance(v, datetime):
+        raise ArticleError(f"{field}에는 시각 없이 YYYY-MM-DD만 씁니다: {v!r}")
     if isinstance(v, date):
         return v.isoformat()
     if isinstance(v, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", v):
-        return v
-    raise ArticleError(f"{field}는 YYYY-MM-DD 형식이어야 합니다: {v!r}")
+        try:
+            return date.fromisoformat(v).isoformat()
+        except ValueError:
+            pass
+    raise ArticleError(f"{field}는 실제 날짜 YYYY-MM-DD여야 합니다: {v!r}")
 
 
 def validate(meta, site):
@@ -245,7 +251,8 @@ def copy_static(out):
             continue
         dst = out / item.name
         if item.is_dir():
-            shutil.copytree(item, dst)
+            # 하위 폴더 안의 *.txt·*.md 등도 배포하지 않는다.
+            shutil.copytree(item, dst, ignore=shutil.ignore_patterns(*(f"*{s}" for s in EXCLUDE_SUFFIX), ".*"))
         else:
             shutil.copy2(item, dst)
 
@@ -294,8 +301,10 @@ def main():
     ap.add_argument("--out", default="_site")
     a = ap.parse_args()
     out = (ROOT / a.out).resolve()
-    if out == ROOT or ROOT not in out.parents:
-        sys.exit("--out은 저장소 안의 하위 폴더여야 합니다")
+    # 빌드는 out을 통째로 지운다 — 원본 폴더(content, tools, articles…)를 지우지 않도록
+    # 저장소 바로 아래의 '_'로 시작하는 폴더만 허용한다(예: _site).
+    if out.parent != ROOT or not out.name.startswith("_"):
+        sys.exit("--out은 저장소 바로 아래 '_'로 시작하는 폴더여야 합니다(예: _site)")
     build(out)
 
 

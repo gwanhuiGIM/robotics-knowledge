@@ -93,7 +93,7 @@ Notion UI: https://app.notion.com/p/c95a3920ae29491cb969c4622ed2aedb
 1. 게시 의도를 확인하고 제목·질문·원문·출처·개인정보를 점검한다.
 2. 이미 같은 주제/Notion page id/원문이 게시됐는지 확인한다.
 3. 원문 출처와 신규 작성 범위를 구분하고, 원문 전체를 확보한다.
-4. [AUTHORING.md](AUTHORING.md)에 따라 `content/<slug>.md`를 작성한다(front matter 필수 필드·`content_mode`). 긴 글은 의미 있는 `##`/`###` 구조로 누락 없는 목차가 나오게 한다. HTML 글이나 홈 카드를 직접 만들지 않는다.
+4. [AUTHORING.md](AUTHORING.md)에 따라 `content/<slug>.md`를 작성한다(front matter 필수 필드·`content_mode`). 긴 글은 의미 있는 `##`/`###` 구조로 누락 없는 목차가 나오게 한다. 새 글을 HTML로 만들거나 홈 카드를 직접 고치지 않는다(기존 HTML 글 수정은 요청 시 AGENTS.md 규칙대로).
 5. 표·코드·수식·Mermaid·그림은 AUTHORING.md 6절 문법으로 원문 정보를 보존한다. 그림 파일은 `assets/img/<slug>/`.
 6. 홈 카드는 배포 시 front matter에서 자동 생성된다. `category`·`tags`·`keywords`로 분류와 검색어를 정한다.
 7. 전체 diff를 검토한다. 기존 게시물 또는 CSS를 불필요하게 다시 쓰지 않는다.
