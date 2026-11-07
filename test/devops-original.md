@@ -120,7 +120,7 @@ CI/CD는 소프트웨어 변경 사항을 검증하고 배포하는 과정을 �
   </box>
 </box>
 
-가령 ROS 2 패키지에 GitHub Actions를 적용한다면, 개발자가 Push할 때마다 Ubuntu 환경에서 의존성을 설치하고 \`colcon build\`와 \`colcon test\`를 자동 실행하도록 설정할 수 있습니다. 여기까지는 CI입니다.
+가령 ROS 2 패키지에 GitHub Actions를 적용한다면, 개발자가 Push할 때마다 Ubuntu 환경에서 의존성을 설치하고 `colcon build`와 `colcon test`를 자동 실행하도록 설정할 수 있습니다. 여기까지는 CI입니다.
 
 검증된 Docker 이미지를 레지스트리에 게시하고, 로봇의 엣지 PC나 Jetson에 배포하는 절차를 추가하면 CD 영역으로 확장할 수 있습니다.
 
@@ -137,7 +137,7 @@ CI/CD는 소프트웨어 변경 사항을 검증하고 배포하는 과정을 �
 | README 작성 | Technical Documentation | 기술 문서화, 지식 전달 |
 | 코드 구조·디렉터리 정리 | Codebase Organization | 코드 구조 설계, 유지보수성 |
 | 불필요한 파일 삭제 | Repository Hygiene | 저장소 품질 관리 |
-| \`.gitignore\` 구성 | Version Control Management | Git·버전 관리 |
+| `.gitignore` 구성 | Version Control Management | Git·버전 관리 |
 | 의존성 및 실행 명령 정리 | Reproducibility | 개발 환경 재현성 |
 | GitHub 공개 | Open-source Publication / Project Sharing | 프로젝트 공유·공개 준비 |
 | 태그, 버전, Release 작성 | Release Management | 버전·릴리스 관리 |
@@ -195,10 +195,10 @@ ROS 2, Python, AI 모델을 다루는 프로젝트라면 다음 순서로 역량
 
 | 단계 | 추가 수행 작업 | 기술 역량 |
 |---|---|---|
-| 1 | README, 구조 정리, \`.gitignore\` | Git, Documentation |
-| 2 | \`requirements.txt\`, \`package.xml\`, 환경 설정 문서화 | Dependency Management |
+| 1 | README, 구조 정리, `.gitignore` | Git, Documentation |
+| 2 | `requirements.txt`, `package.xml`, 환경 설정 문서화 | Dependency Management |
 | 3 | 다른 PC에서 Clone 후 빌드·실행 검증 | Reproducibility |
-| 4 | \`pytest\`, \`colcon test\` 도입 | Software Testing |
+| 4 | `pytest`, `colcon test` 도입 | Software Testing |
 | 5 | GitHub Actions로 빌드·테스트 자동화 | CI |
 | 6 | Docker 이미지 및 버전별 Release 자동 생성 | CI/CD, Release Engineering |
 | 7 | Jetson·로봇 배포 및 모니터링·롤백 체계 구축 | Deployment, Operations |
@@ -213,7 +213,7 @@ ROS 2, Python, AI 모델을 다루는 프로젝트라면 다음 순서로 역량
 
 단순한 파일 정리보다 구조 개선과 실행 환경 표준화까지 수행했다면 **소프트웨어 유지보수성 및 재현성 개선 경험**으로 확장할 수 있습니다.
 
-이력서의 기술 키워드로는 \`Git/GitHub\`, \`Technical Documentation\`, \`Repository Management\`, \`Software Maintenance\`가 적절합니다. CI/CD는 자동화된 빌드·테스트·배포 경험을 확보한 이후 기재하는 것이 정확합니다.
+이력서의 기술 키워드로는 `Git/GitHub`, `Technical Documentation`, `Repository Management`, `Software Maintenance`가 적절합니다. CI/CD는 자동화된 빌드·테스트·배포 경험을 확보한 이후 기재하는 것이 정확합니다.
 
 참고 문서: <Link url="https://docs.github.com/en/actions/get-started/understand-github-actions" title="GitHub Actions 공식 문서"/> · <Link url="https://www.redhat.com/en/topics/devops/what-is-ci-cd" title="Red Hat CI/CD 개념 설명"/>
 
