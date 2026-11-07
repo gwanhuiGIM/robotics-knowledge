@@ -17,6 +17,7 @@
 
 1. **ChatGPT GitHub connector(새 글 기본)**: GPT가 Markdown 원문을 `content/<slug>.md`로 직접 커밋한다. 그림은 base64 blob으로 `assets/img/<slug>/`에 커밋한다(2026-11-07 시험 브랜치에서 텍스트 바이트 일치·PNG 커밋 1건 확인). 글과 그림은 한 커밋으로 올리는 것을 권장한다.
    - 2026-11-07 시험(1건): GPT가 자기 이전 답변(레이아웃 태그 포함)을 커밋한 결과가 답변 공유 링크의 원본과 일치했다(끝의 후속 제안 목록 제외, 마지막 줄바꿈 1개 차이). 다만 첫 커밋은 인라인 코드 백틱을 `` \` ``로 바꿔 적었고, GPT가 파일을 다시 읽은 뒤 두 번째 커밋으로 고쳤다.
+   - 그래서 **커밋 뒤 파일을 다시 읽어 원문과 대조하고, 다르면 고친 뒤 보고한다**(바뀐 곳과 최종 커밋 SHA 포함).
 2. **로컬 보완**: GPT에게 "Markdown 원문을 바깥 백틱 4개 코드 블록 하나로 출력"하게 한 뒤 그 블록 내용을 받아 파일로 저장한다.
 3. **쓰지 않는 방법**: 렌더링된 답변을 드래그 복사하거나 답변 복사 버튼으로 받은 텍스트. 2026-11-06~07에 답변 복사 버튼 2건·드래그 1건을 확인했는데, 모두 원문 Markdown과 달랐다(제목·표 구조 손실, Mermaid 원문 파손, 수식 역슬래시 변형, `**`·코드 언어명 소실 중 일부). 같은 복사 버튼이라도 답변에 따라 손실 양상이 달랐다.
 
@@ -127,5 +128,5 @@ python3 -m http.server 8799 --directory _site   # 브라우저로 http://127.0.0
 
 ```text
 사이트 게시 요청을 받으면 GitHub 저장소 gwanhuiGIM/robotics-knowledge의 docs/AUTHORING.md와 AGENTS.md를 connector로 먼저 읽고 그대로 따른다.
-새 글은 content/<slug>.md(Markdown 원문 + front matter)로만 커밋한다. 새 글을 articles/*.html로 만들거나 홈 카드(tools/templates/index.html, tools/legacy_cards.yml)를 직접 고치지 않는다. 기존 HTML 글의 수정은 사용자가 요청했을 때만 AGENTS.md 규칙대로 한다.
+새 글은 content/<slug>.md(Markdown 원문 + front matter)로만 커밋한다. 커밋 뒤 파일을 다시 읽어 원문과 대조하고, 다르면 고친 뒤 바뀐 곳과 최종 커밋 SHA를 보고한다. 새 글을 articles/*.html로 만들거나 홈 카드(tools/templates/index.html, tools/legacy_cards.yml)를 직접 고치지 않는다. 기존 HTML 글의 수정은 사용자가 요청했을 때만 AGENTS.md 규칙대로 한다.
 ```
