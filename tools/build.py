@@ -10,6 +10,7 @@ content/*.md(front matter + Markdown) -> articles/<slug>.html, 홈 index.html �
 import argparse
 import html
 import re
+import secrets
 import shutil
 import sys
 from datetime import date, datetime
@@ -21,6 +22,8 @@ import yaml
 from markdown_it import MarkdownIt
 from mdit_py_plugins.dollarmath import dollarmath_plugin
 from mdit_py_plugins.texmath import texmath_plugin
+
+import layout_tags
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
@@ -38,6 +41,9 @@ KATEX_JS = ('<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/
             'integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>\n')  # pragma: allowlist secret
 MERMAID_JS = ('<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" '
               'integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>\n')  # pragma: allowlist secret
+# ChatGPT 레이아웃 태그의 <icon name="…">(lucide 아이콘 이름). 못 불러오면 아이콘 자리만 비고 글자는 그대로다.
+LUCIDE_JS = ('<script defer src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" '
+             'integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>\n')  # pragma: allowlist secret
 ARTICLE_JS = '<script defer src="../assets/article.js"></script>\n'
 
 ALLOWED_TAGS = {
@@ -204,7 +210,17 @@ def render_article(path, md, site, tpl):
     meta, body_md = split_front_matter(path.read_text(encoding="utf-8"), path)
     validate(meta, site)
     env = {}
-    body = sanitize(convert_custom_tags(md.render(body_md, env)))
+
+    def clean(s):
+        return sanitize(convert_custom_tags(s))
+
+    # ChatGPT 레이아웃 태그 블록은 자리표시로 빼 두었다가 따로 렌더해 끼운다(tools/layout_tags.py).
+    nonce = secrets.token_hex(6)
+    body_md, blocks = layout_tags.extract(body_md, nonce)
+    body = clean(md.render(body_md, env))
+    body, layout_warnings = layout_tags.render_blocks(body, blocks, nonce, md, env, clean)
+    for w in layout_warnings:
+        warn(path.relative_to(ROOT) if path.is_relative_to(ROOT) else path, w)
     esc = html.escape
     summary_box = (f'<section class="gen-box"><div class="gen-label">요약 · 게시 시 작성</div>'
                    f'<p>{esc(meta["summary"])}</p></section>\n')
@@ -213,7 +229,8 @@ def render_article(path, md, site, tpl):
         items = "".join(f"<li>{esc(x)}</li>" for x in meta["jd"])
         jd_box = f'<section class="gen-box jd-box"><div class="gen-label">JD 핵심 문장</div><ul>{items}</ul></section>\n'
     head_extra = KATEX if env.get("has_math") else ""
-    tail_extra = (KATEX_JS if env.get("has_math") else "") + (MERMAID_JS if env.get("has_mermaid") else "") + ARTICLE_JS
+    tail_extra = ((KATEX_JS if env.get("has_math") else "") + (MERMAID_JS if env.get("has_mermaid") else "")
+                  + (LUCIDE_JS if env.get("has_icons") else "") + ARTICLE_JS)
     page = tpl.substitute(
         title=esc(meta["title"]),
         summary_attr=esc(meta["summary"], quote=True),

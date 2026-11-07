@@ -25,10 +25,10 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 ## Existing implementation (verify before relying on it)
 
 - **New articles are Markdown**: write `content/<slug>.md` (front matter + Markdown) following [docs/AUTHORING.md](docs/AUTHORING.md). Allowed values live only in `tools/site.yml`. Do **not** create `articles/*.html` or edit the homepage by hand for new articles.
-- `tools/build.py`: builds `_site/` on deploy — renders `content/*.md` to `articles/<slug>.html`, generates the homepage from `tools/templates/index.html`, copies legacy files, excludes `docs/`, `AGENTS.md`, `*.txt`, `content/`, `tools/`.
+- `tools/build.py`: builds `_site/` on deploy — renders `content/*.md` to `articles/<slug>.html`, generates the homepage from `tools/templates/index.html`, copies legacy files, excludes `docs/`, `AGENTS.md`, `*.txt`, `content/`, `tools/`. `tools/layout_tags.py` renders ChatGPT layout tags (`<box>`, `<row>`, `<grid>`, `{#each}`) kept verbatim in `content/*.md`.
 - `tools/legacy_cards.yml`: verbatim homepage cards of the legacy HTML articles.
 - `articles/*.html`: legacy static articles (individual markup/styles); keep unless migrating one to `content/` in the same change.
-- `assets/reader.css`, `assets/reader.js`: shared article reading UI. `assets/article.css`, `assets/article.js`: Markdown article styles and KaTeX/Mermaid rendering (pinned CDN versions with SRI in `tools/build.py`).
+- `assets/reader.css`, `assets/reader.js`: shared article reading UI. `assets/article.css`, `assets/article.js`: Markdown article styles and KaTeX/Mermaid/lucide-icon rendering (pinned CDN versions with SRI in `tools/build.py`).
 - `tests/check.py`: renderer and site self-check (`python tests/check.py --site _site`).
 - `.github/workflows/static.yml`: on `main` push, builds `_site`, runs the self-check (warning only), deploys `_site` to GitHub Pages.
 - No independent database server is currently a documented requirement; GitHub files are the source of truth.

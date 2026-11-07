@@ -78,11 +78,11 @@ Notion UI: https://app.notion.com/p/c95a3920ae29491cb969c4622ed2aedb
 저장소를 실시간 조회해 구조를 확인한 후 작업한다. 현재 알려진 경로:
 
 - `content/*.md`: 새 글 원본(front matter + Markdown). 작성 규약은 [AUTHORING.md](AUTHORING.md), 허용 값은 `tools/site.yml`
-- `tools/build.py`: 배포 시 `_site/` 생성 — 새 글 HTML·홈 카드 생성, 기존 파일 복사, 내부 문서 제외
+- `tools/build.py`: 배포 시 `_site/` 생성 — 새 글 HTML·홈 카드 생성, 기존 파일 복사, 내부 문서 제외. `tools/layout_tags.py`: ChatGPT 레이아웃 태그(`<box>`·`<row>`·`{#each}` 등) 렌더
 - `tools/templates/index.html`: 홈 템플릿(카테고리 버튼, 검색, 자료 수). 홈 카드는 빌드가 채운다
 - `tools/legacy_cards.yml`: 기존 HTML 글의 홈 카드(원문 그대로)
 - `articles/*.html`: 기존 HTML 문서 (각자 스타일을 포함할 수 있음)
-- `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI / `assets/article.css`, `assets/article.js`: Markdown 글 스타일과 수식·Mermaid 렌더
+- `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI / `assets/article.css`, `assets/article.js`: Markdown 글 스타일과 수식·Mermaid·레이아웃 아이콘(lucide) 렌더
 - `tests/check.py`: 렌더러·사이트 자가검증
 - `.github/workflows/static.yml`: `main` push시 빌드 → 자가검증(경고만) → `_site` 배포
 

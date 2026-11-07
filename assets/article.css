@@ -59,3 +59,37 @@ a{color:#cbd5df}
 .badge-color-success{background:#1f3a2b;color:#9fdcb5}.badge-color-warning{background:#3a3220;color:#e8cf8f}
 .badge-color-danger,.badge-color-error{background:#3a2226;color:#f0a19c}.badge-color-info{background:#1d2f40;color:#9cc8ef}
 .tx-color-secondary{color:var(--art-muted)}.tx-size-xs{font-size:12px}.tx-size-sm{font-size:13.5px}
+.tx-size-md{font-size:15px}.tx-size-lg{font-size:17px}.tx-weight-medium{font-weight:600}.tx-weight-bold,.tx-weight-semibold{font-weight:700}
+.tx-color-tertiary{color:#8a949e}.tx-color-success{color:#9fdcb5}.tx-color-warning{color:#e8cf8f}.tx-color-danger{color:#f0a19c}.tx-color-info{color:#9cc8ef}
+
+/* ChatGPT 레이아웃 태그(tools/layout_tags.py): box·row·grid는 flex/grid 상자. 모양은 근사치다. */
+.lt-root{margin:16px 0}
+.lt-box{display:flex;flex-direction:column;min-width:0}
+.lt-row{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;min-width:0}
+.lt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.lt-cols-1{grid-template-columns:minmax(0,1fr)}.lt-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lt-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.lt-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.lt-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.lt-cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.lt-grid-item{min-width:0;display:flex;flex-direction:column}.lt-grid-item>.lt-box{flex:1}
+.lt-gap-0{gap:0}.lt-gap-1{gap:4px}.lt-gap-2{gap:8px}.lt-gap-3{gap:12px}.lt-gap-4{gap:16px}.lt-gap-5{gap:20px}.lt-gap-6{gap:24px}
+.lt-pad-0{padding:0}.lt-pad-1{padding:4px}.lt-pad-2{padding:8px}.lt-pad-3{padding:12px}.lt-pad-4{padding:16px}.lt-pad-5{padding:20px}.lt-pad-6{padding:24px}
+.lt-r-sm{border-radius:6px}.lt-r-md{border-radius:8px}.lt-r-lg{border-radius:12px}.lt-r-xl{border-radius:16px}.lt-r-full{border-radius:999px}
+.lt-box.lt-al-center{align-items:center;text-align:center}.lt-box.lt-al-start{align-items:flex-start}.lt-box.lt-al-end{align-items:flex-end}
+.lt-row.lt-al-center{align-items:center}.lt-row.lt-al-start{align-items:flex-start}.lt-row.lt-al-end{align-items:flex-end}.lt-row.lt-al-baseline{align-items:baseline}
+.lt-jc-center{justify-content:center}.lt-jc-between{justify-content:space-between}.lt-jc-end{justify-content:flex-end}.lt-jc-around{justify-content:space-around}.lt-jc-evenly{justify-content:space-evenly}
+.lt-flex-1{flex:1 1 0}
+.lt-bd{border:1px solid var(--art-line)}
+.lt-bg-surface{background:#20242b}.lt-bg-surface-secondary{background:var(--art-panel)}.lt-bg-surface-tertiary{background:#262b33}
+.lt-root p{margin:0}.lt-root p+p{margin-top:6px}
+.lt-caption{font-size:12px;color:var(--art-muted)}
+.lt-divider{border:0;border-top:1px solid var(--art-line);margin:0;width:100%}
+.lt-icon{display:inline-flex;flex:none}
+.lt-root svg.lucide{width:18px;height:18px;flex:none}
+.lt-root svg.lt-icon-size-sm{width:14px;height:14px}.lt-root svg.lt-icon-size-lg{width:24px;height:24px}.lt-root svg.lt-icon-size-xl{width:32px;height:32px}
+.lt-icon-color-secondary{color:var(--art-muted)}.lt-icon-color-tertiary{color:#8a949e}.lt-icon-color-success{color:#9fdcb5}.lt-icon-color-warning{color:#e8cf8f}.lt-icon-color-danger{color:#f0a19c}.lt-icon-color-info{color:#9cc8ef}
+.lt-writing{border:1px solid #414750;border-radius:10px;padding:10px 14px;background:#161a20}
+.lt-writing::before{content:"Writing";display:block;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--art-muted);margin-bottom:4px}
+.lt-unknown{border:1px dashed #5b6470;border-radius:8px;padding:6px 10px}
+.lt-fallback__note{font-size:12px;color:#ecc77a;margin:4px 0}
+/* reader.css의 overflow-wrap:anywhere가 좁은 상자에서 "Development"를 글자 단위로 끊지 않게: 단어 단위로 줄바꿈하고 폭 지정 상자는 가장 긴 단어만큼은 넓어진다 */
+.lt-root{overflow-wrap:break-word}.lt-box[style*="width:"]{min-width:min-content}

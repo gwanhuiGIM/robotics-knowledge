@@ -1,4 +1,4 @@
-/* content/*.md에서 생성한 글: 수식(KaTeX)과 Mermaid를 브라우저에서 그린다.
+/* content/*.md에서 생성한 글: 수식(KaTeX)·Mermaid·레이아웃 아이콘(lucide)을 브라우저에서 그린다.
    라이브러리를 못 불러오거나 그리기에 실패하면 원문(TeX·Mermaid 코드)을 그대로 둔다. */
 (function () {
   "use strict";
@@ -37,6 +37,11 @@
       });
     });
   }
-  function run() { renderMath(); renderMermaid(); }
+  function renderIcons() {
+    // ChatGPT 레이아웃 태그의 <icon> → lucide SVG. 라이브러리가 없으면 빈 자리로 둔다(장식 요소).
+    if (!window.lucide || !document.querySelector("i[data-lucide]")) return;
+    try { window.lucide.createIcons({ icons: window.lucide.icons }); } catch (e) { /* 아이콘만 빠진다 */ }
+  }
+  function run() { renderMath(); renderMermaid(); renderIcons(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();

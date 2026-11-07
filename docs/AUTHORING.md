@@ -16,6 +16,7 @@
 ## 2. 입력 경로
 
 1. **ChatGPT GitHub connector(새 글 기본)**: GPT가 Markdown 원문을 `content/<slug>.md`로 직접 커밋한다. 그림은 base64 blob으로 `assets/img/<slug>/`에 커밋한다(2026-11-07 시험 브랜치에서 텍스트 바이트 일치·PNG 커밋 1건 확인). 글과 그림은 한 커밋으로 올리는 것을 권장한다.
+   - 2026-11-07 시험(1건): GPT가 자기 이전 답변(레이아웃 태그 포함)을 커밋한 결과가 답변 공유 링크의 원본과 일치했다(끝의 후속 제안 목록 제외, 마지막 줄바꿈 1개 차이). 다만 첫 커밋은 인라인 코드 백틱을 `` \` ``로 바꿔 적었고, GPT가 파일을 다시 읽은 뒤 두 번째 커밋으로 고쳤다.
 2. **로컬 보완**: GPT에게 "Markdown 원문을 바깥 백틱 4개 코드 블록 하나로 출력"하게 한 뒤 그 블록 내용을 받아 파일로 저장한다.
 3. **쓰지 않는 방법**: 렌더링된 답변을 드래그 복사하거나 답변 복사 버튼으로 받은 텍스트. 2026-11-06~07에 답변 복사 버튼 2건·드래그 1건을 확인했는데, 모두 원문 Markdown과 달랐다(제목·표 구조 손실, Mermaid 원문 파손, 수식 역슬래시 변형, `**`·코드 언어명 소실 중 일부). 같은 복사 버튼이라도 답변에 따라 손실 양상이 달랐다.
 
@@ -80,6 +81,7 @@ source_note: "출처: …"             # 선택 — 글 맨 아래 출처 문구
 | 알림 상자 | `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!PROMPT]` | `[!…]` 줄 끝에 다른 글자나 `\`를 붙이지 않는다 |
 | 카드 | 아래 HTML | 정보 구조가 있는 비교·단계에만. 단순 안내는 알림 상자 |
 | 강조 태그 | `<badge color="success">수용</badge>`, `<text color="secondary" size="xs">…</text>` | ChatGPT 답변에 나오는 태그. color: success·warning·danger·info |
+| 레이아웃 태그 | ChatGPT 답변 원문의 `<box>`·`<row>`·`<grid>`·`<grid-item>`·`<icon>`·`<caption>`·`<divider>`·`<WritingBlock>`·`<Link>`, `{#each … as item}` | 아래 "레이아웃 태그" 참고. 원문 그대로 두면 빌드가 상자·행·격자로 그린다 |
 | 그림 | `![대체 텍스트](../assets/img/<slug>/x.png)` | 대체 텍스트 필수. 외부 이미지는 출처·이용 권한 확인 |
 | 접기 | `<details><summary>제목</summary>` + 빈 줄 + 내용 + 빈 줄 + `</details>` | 원문 텍스트를 함께 남길 때 |
 
@@ -94,6 +96,17 @@ source_note: "출처: …"             # 선택 — 글 맨 아래 출처 문구
 
 - HTML은 허용 목록만 남고 나머지는 지워진다(`<script>`, `onclick` 같은 속성, `javascript:` 링크, `style`(표 정렬 제외)). 허용 목록: `tools/build.py`의 `ALLOWED_TAGS`·`ALLOWED_ATTRS`.
 - 카드 HTML 블록 안에서는 Markdown 문법이 적용되지 않는다. 코드는 `<code>`로 쓴다.
+
+### 레이아웃 태그 (ChatGPT 화면의 카드·흐름도)
+
+ChatGPT 화면의 카드·흐름도·"Writing" 상자는 답변 원문 Markdown 안에 JSX 비슷한 태그로 들어 있다(2026-11-07 답변 공유 링크 원본에서 확인). **원문을 고치지 않고 그대로 커밋한다.** 빌드(`tools/layout_tags.py`)가 다음처럼 처리한다.
+
+- `<box>`·`<row>`·`<grid>`·`<grid-item>`·`<divider>`·`<WritingBlock>`로 시작하는 줄부터 그 태그가 닫히는 줄까지를 한 블록으로 읽는다. 코드 fence 안은 건드리지 않는다.
+- 속성 `gap`·`padding`·`radius`·`align`·`justify`·`background`·`border`·`width`·`flex`·`columns`는 정해진 값(숫자, 색 `rgba()`·`#hex`, 이름 토큰)만 반영하고 나머지는 버린다. 태그 사이 글자는 Markdown(굵게·수식 등)으로 렌더한다.
+- `<icon name="…">`은 lucide 아이콘 이름이다. CDN(lucide 0.469.0)을 못 불러오면 아이콘 자리만 비고 글자는 그대로다.
+- `<Link url title/>`은 문단 안에서도 링크로 바뀐다. `http`·`https` 주소만 링크가 된다.
+- **모르는 태그**는 상자로 감싸 안의 글자만 보이고, **해석하지 못한 블록**은 원문 소스를 그대로 보인다. 둘 다 Actions에 `::warning`을 남기고 글은 배포된다.
+- 모양(아이콘·색·여백)은 ChatGPT 화면과 비슷하게까지다. 이 태그 형식은 OpenAI의 비공개 사양이라 바뀔 수 있다.
 
 ## 7. 게시 전 확인
 

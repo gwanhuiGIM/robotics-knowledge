@@ -19,7 +19,7 @@
 ## 현행 사이트 구조
 
 - `content/*.md` — 새 글 원본(Markdown). 작성 규약: [docs/AUTHORING.md](docs/AUTHORING.md)
-- `tools/build.py` — 배포 시 `_site/` 생성(새 글 HTML·홈 카드 자동 생성)
+- `tools/build.py` — 배포 시 `_site/` 생성(새 글 HTML·홈 카드 자동 생성). ChatGPT 레이아웃 태그는 `tools/layout_tags.py`
 - `tools/templates/index.html` — 홈(카드·카테고리·검색) 템플릿
 - `articles/` — 기존 HTML 학습 문서
 - `assets/` — 공통 읽기 UI(`reader.*`), Markdown 글 스타일·수식·다이어그램(`article.*`), 그림(`img/`)

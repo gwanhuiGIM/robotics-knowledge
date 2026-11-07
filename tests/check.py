@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """빌드 자가검증. 사용: python tests/check.py [--site _site]
 
-1) 렌더러 단위 시험 — tests/fixtures/visual-sample.md를 렌더해 수식·Mermaid·Alert·표·sanitize를 확인
+1) 렌더러 단위 시험 — tests/fixtures/visual-sample.md를 렌더해 수식·Mermaid·Alert·표·sanitize를 확인,
+   tests/fixtures/layout-sample.md로 ChatGPT 레이아웃 태그(반복·속성 검증·sanitize·원문 표시 대체)를 확인
 2) 사이트 시험(--site) — 홈 카드 href가 모두 존재, 카드 수 = 기존 카드 + 생성 글, 생성 글에 reader 자산 포함
 실패하면 종료 코드 1. 배포를 막지 않으려면 workflow에서 continue-on-error로 둔다.
 """
@@ -51,6 +52,34 @@ def unit():
     check('mode-new_answer' in card and 'data-category="Systems"' in card, "카드 라벨")
 
 
+def layout_unit():
+    """ChatGPT 레이아웃 태그(tools/layout_tags.py) — tests/fixtures/layout-sample.md."""
+    site = build.load_site()
+    md = build.make_md()
+    tpl = Template((ROOT / "tools/templates/article.html").read_text(encoding="utf-8"))
+    _, page, _, _ = build.render_article(ROOT / "tests/fixtures/layout-sample.md", md, site, tpl)
+    body = page.split('<div class="art-body">', 1)[1].split('<footer class="art-foot">', 1)[0]
+    check(body.count('class="lt-root"') == 1, "정상 레이아웃 블록 1개")
+    check(body.count("data-lucide=") == 3 and all(f'data-lucide="{n}"' in body for n in ("hammer", "check-check", "scan-search")),
+          "{#each} 3회 반복 + 아이콘 이름 치환")
+    check(all(f'<span class="tx tx-size-xs">{n}</span>' in body for n in ("빌드", "테스트", "코드 검사")), "{item.name} 글자 치환")
+    check('class="lt-grid lt-gap-2 lt-cols-3"' in body and 'class="lt-row lt-al-center lt-jc-between"' in body, "grid·row 속성")
+    check("<strong>CI 단계</strong>" in body and '<span class="badge">Integration</span>' in body, "태그 사이 Markdown·badge")
+    check('style="background-color:rgba(30,110,200,0.07);border:1px solid;border-color:rgba(30,110,200,0.2);width:100px;flex:none"' in body,
+          "rgba 배경·테두리·폭")
+    check("position" not in body and "red;" not in body, "검증 안 된 style 값은 버림")
+    check("<script" not in body and "onerror" not in body and 'href="javascript:' not in body, "레이아웃 안 sanitize")
+    check('<div class="lt-unknown"><p>모르는 태그 안 글자</p>' in body, "모르는 태그는 글자 표시")
+    check('<div class="lt-writing"><p>예시 문장 <strong>강조</strong></p>' in body, "WritingBlock")
+    check('<span class="math-inline">v=\\omega r</span>' in body and "katex.min.js" in page, "레이아웃 안 수식")
+    check('<a href="https://example.com/doc" rel="noopener noreferrer">예시 문서</a>' in body, "문단 안 <Link>")
+    check("&lt;box gap={3}&gt;코드 블록 안 태그는 그대로" in body, "코드 블록 안 태그는 변환하지 않음")
+    check('class="lt-fallback"' in body and "닫히지 않은 블록 원문" in body, "닫히지 않은 블록은 원문 표시")
+    check("<h2>다음 절</h2>" in body and "<p>닫히지 않은 블록 뒤 문단도 살아 있어야 함</p>" in body, "닫히지 않은 블록이 뒤 내용을 삼키지 않음")
+    check("@@LAYOUT" not in body, "자리표시 잔존 없음")
+    check("lucide.min.js" in page, "아이콘 스크립트 포함")
+
+
 def site_check(out):
     index = (out / "index.html").read_text(encoding="utf-8")
     hrefs = re.findall(r'<a class="article"[^>]*href="([^"]+)"', index)
@@ -80,6 +109,7 @@ def main():
     ap.add_argument("--site")
     a = ap.parse_args()
     unit()
+    layout_unit()
     if a.site:
         site_check((ROOT / a.site).resolve())
     for f in fails:
