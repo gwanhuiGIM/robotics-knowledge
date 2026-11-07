@@ -20,14 +20,16 @@ Build a growing Korean robotics study archive from ChatGPT Q&A. The highest prio
 10. The user asked to store operating and agent rules. AGENTS.md, docs/OPERATIONS.md and README.md were created.
 11. The user asked about cloned local repositories and web agents working together. We recommended shared Git, feature branches and PRs; handoff documentation is for context, not automatic file synchronization.
 12. The user asked whether the handoff exists and for this session's intent and exchange history to be recorded. This document addresses that request.
+13. (2026-11-07, local Claude Code session with the user) The site's core intent was restated as a JD / industry-technology knowledge site whose agent-generated visuals (tables, flowcharts, math, code, cards) must survive publishing. After a design exchange with ChatGPT, the user approved moving new articles to Markdown sources (`content/*.md`) built into HTML on deploy, with the homepage generated from front matter. Rules: [AUTHORING.md](AUTHORING.md). Input tests (one case each): the ChatGPT GitHub connector committed a Markdown sample byte-identical and a PNG to a test branch; answer copy/drag produced altered Markdown, so they are not used as sources. Dev/Ops was migrated as the first pilot article.
 
 This is a curated paraphrased history, not a full original transcript. Never present it as a replacement for source Q&A.
 
 ## Operational source of truth and current structure
 - Repository: https://github.com/gwanhuiGIM/robotics-knowledge
 - Site: https://gwanhuigim.github.io/robotics-knowledge/
-- index.html: articles, categories, keyword search
-- articles/: the published pages (some older material explicitly reconstructed, not original transcript)
+- content/*.md: new article sources (see docs/AUTHORING.md); tools/build.py builds the site and homepage on deploy
+- tools/templates/index.html: homepage template (categories, keyword search); cards are generated
+- articles/: legacy published HTML pages (some older material explicitly reconstructed, not original transcript)
 - assets/reader.css and assets/reader.js: shared navigation and reading interface
 - .github/workflows/static.yml: Pages deployment on main
 - AGENTS.md: invariant agent rules; docs/OPERATIONS.md: operational procedure; docs/HANDOFF.md: current decisions/status
@@ -41,4 +43,4 @@ Previously configured task: Robotics Knowledge Lab 게시 자동화, ID 6a95f0a1
 - Suggested future work, not implemented merely by this document: preserve original source in content files, separate metadata, shared rendering templates, automated regression tests, controlled Notion-to-GitHub dry run.
 - Local and web agents should operate on separate branches/PRs where practical, refresh current state before writing to shared files, and record verified work plus uncertainties. Never rewrite user Q&A merely to polish layout.
 
-Updated: 2026-11-03. This update documents decisions only; it does not establish a successful browser or scheduled-job test.
+Updated: 2026-11-07. Entry 13 records the Markdown pipeline decision; local build, self-check and headless-Chrome checks passed on the feature branch, but GitHub Actions deployment and the scheduled job were not tested.

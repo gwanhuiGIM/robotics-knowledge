@@ -24,10 +24,13 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 
 ## Existing implementation (verify before relying on it)
 
-- `index.html`: current homepage card listing and filter script.
-- `articles/*.html`: published static articles, individual legacy markup/styles.
-- `assets/reader.css`, `assets/reader.js`: shared article reading UI.
-- `.github/workflows/static.yml`: GitHub Pages deploy workflow triggered on `main`.
+- **New articles are Markdown**: write `content/<slug>.md` (front matter + Markdown) following [docs/AUTHORING.md](docs/AUTHORING.md). Allowed values live only in `tools/site.yml`. Do **not** create `articles/*.html` or edit the homepage by hand for new articles.
+- `tools/build.py`: builds `_site/` on deploy — renders `content/*.md` to `articles/<slug>.html`, generates the homepage from `tools/templates/index.html`, copies legacy files, excludes `docs/`, `AGENTS.md`, `*.txt`, `content/`, `tools/`.
+- `tools/legacy_cards.yml`: verbatim homepage cards of the legacy HTML articles.
+- `articles/*.html`: legacy static articles (individual markup/styles); keep unless migrating one to `content/` in the same change.
+- `assets/reader.css`, `assets/reader.js`: shared article reading UI. `assets/article.css`, `assets/article.js`: Markdown article styles and KaTeX/Mermaid rendering (pinned CDN versions with SRI in `tools/build.py`).
+- `tests/check.py`: renderer and site self-check (`python tests/check.py --site _site`).
+- `.github/workflows/static.yml`: on `main` push, builds `_site`, runs the self-check (warning only), deploys `_site` to GitHub Pages.
 - No independent database server is currently a documented requirement; GitHub files are the source of truth.
 
 ## Publish checklist
@@ -37,7 +40,7 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 - [ ] Original Q&A content complete (or limitations clearly stated)
 - [ ] Tables/code/math/links/visuals handled without unmarked alteration
 - [ ] Existing article checked; safe filename and category/keywords chosen
-- [ ] Article links shared reader assets; homepage lists it once
+- [ ] New article written as `content/<slug>.md` per docs/AUTHORING.md (front matter valid, `content_mode` accurate); homepage lists it once
 - [ ] Search and categories actually hide nonmatching cards
 - [ ] Heading IDs/TOC anchors valid; long tables scroll within mobile viewport
 - [ ] Accessibility, keyboard interaction and narrow screen checked where tooling permits

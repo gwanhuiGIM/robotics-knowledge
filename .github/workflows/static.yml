@@ -1,4 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Build content/*.md into static HTML and deploy to GitHub Pages
 name: Deploy static content to Pages
 
 on:
@@ -31,13 +31,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build dependencies
+        run: pip install -r tools/requirements.txt
+      - name: Build site (content/*.md -> _site)
+        # 글 하나가 실패하면 그 글만 빠지고 ::warning이 남는다. 빌드 자체가 실패하면 직전 배포가 유지된다.
+        run: python tools/build.py --out _site
+      - name: Self-check (warning only)
+        continue-on-error: true
+        run: python tests/check.py --site _site
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # docs/, AGENTS.md, *.txt, content/, tools/ 등은 build.py가 _site에서 제외한다.
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

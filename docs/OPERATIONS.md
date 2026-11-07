@@ -77,21 +77,25 @@ Notion UI: https://app.notion.com/p/c95a3920ae29491cb969c4622ed2aedb
 
 저장소를 실시간 조회해 구조를 확인한 후 작업한다. 현재 알려진 경로:
 
-- `index.html`: 게시 카드 목록, 카테고리 버튼, 검색, 자료 수
-- `articles/*.html`: 개별 문서 (기존 각자 스타일을 포함할 수 있음)
-- `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI
-- `.github/workflows/static.yml`: `main` push시 GitHub Pages 배포
+- `content/*.md`: 새 글 원본(front matter + Markdown). 작성 규약은 [AUTHORING.md](AUTHORING.md), 허용 값은 `tools/site.yml`
+- `tools/build.py`: 배포 시 `_site/` 생성 — 새 글 HTML·홈 카드 생성, 기존 파일 복사, 내부 문서 제외
+- `tools/templates/index.html`: 홈 템플릿(카테고리 버튼, 검색, 자료 수). 홈 카드는 빌드가 채운다
+- `tools/legacy_cards.yml`: 기존 HTML 글의 홈 카드(원문 그대로)
+- `articles/*.html`: 기존 HTML 문서 (각자 스타일을 포함할 수 있음)
+- `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI / `assets/article.css`, `assets/article.js`: Markdown 글 스타일과 수식·Mermaid 렌더
+- `tests/check.py`: 렌더러·사이트 자가검증
+- `.github/workflows/static.yml`: `main` push시 빌드 → 자가검증(경고만) → `_site` 배포
 
-**주의:** `content/*.md`, `metadata.json`, CI 테스트 파이프라인, 서버 DB 등은 장기적 개선 제안이지 현재 존재한다고 보장하지 않는다. 별도 승인 없이 전체 구조를 전면 교체하지 말 것.
+**주의:** 기존 HTML 글은 한꺼번에 변환하지 않는다. 옮길 때는 한 편씩, 원문 텍스트 대조와 함께 한다(2026-11-07 Dev/Ops 1편 시범). 서버 DB 등은 장기 제안이며 별도 승인 없이 전체 구조를 전면 교체하지 말 것.
 
 ## 6. 게시/수정 절차 (에이전트 SOP)
 
 1. 게시 의도를 확인하고 제목·질문·원문·출처·개인정보를 점검한다.
 2. 이미 같은 주제/Notion page id/원문이 게시됐는지 확인한다.
 3. 원문 출처와 신규 작성 범위를 구분하고, 원문 전체를 확보한다.
-4. 현재 `articles/` 문서 구조 및 공통 reader asset을 참조해 HTML 콘텐츠 생성. 긴 글은 의미 있는 `h2/h3` 구조를 사용하고 누락 없는 목차가 나오게 한다.
-5. 표는 `table` 구조와 좁은 화면 내부 스크롤을 사용. 코드·수식·그림 정보 보존.
-6. `index.html`의 적합한 카테고리 카드에 정확히 하나 추가. 검색 키워드 포함. 기존 필터가 깨지지 않아야 한다.
+4. [AUTHORING.md](AUTHORING.md)에 따라 `content/<slug>.md`를 작성한다(front matter 필수 필드·`content_mode`). 긴 글은 의미 있는 `##`/`###` 구조로 누락 없는 목차가 나오게 한다. HTML 글이나 홈 카드를 직접 만들지 않는다.
+5. 표·코드·수식·Mermaid·그림은 AUTHORING.md 6절 문법으로 원문 정보를 보존한다. 그림 파일은 `assets/img/<slug>/`.
+6. 홈 카드는 배포 시 front matter에서 자동 생성된다. `category`·`tags`·`keywords`로 분류와 검색어를 정한다.
 7. 전체 diff를 검토한다. 기존 게시물 또는 CSS를 불필요하게 다시 쓰지 않는다.
 8. GitHub write 응답의 커밋 SHA를 보존한다.
 9. 가능한 환경에서 실제 Pages 접속·GitHub Actions 성공과 검색/목차/모바일 동작을 검증한다. 코드 존재만으로 동작을 단정하지 않는다.

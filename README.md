@@ -18,9 +18,11 @@
 
 ## 현행 사이트 구조
 
-- `index.html` — 카드·카테고리·검색
-- `articles/` — 공개 학습 문서
-- `assets/reader.css`, `assets/reader.js` — 공통 읽기 UI
-- `.github/workflows/static.yml` — `main` GitHub Pages 배포
+- `content/*.md` — 새 글 원본(Markdown). 작성 규약: [docs/AUTHORING.md](docs/AUTHORING.md)
+- `tools/build.py` — 배포 시 `_site/` 생성(새 글 HTML·홈 카드 자동 생성)
+- `tools/templates/index.html` — 홈(카드·카테고리·검색) 템플릿
+- `articles/` — 기존 HTML 학습 문서
+- `assets/` — 공통 읽기 UI(`reader.*`), Markdown 글 스타일·수식·다이어그램(`article.*`), 그림(`img/`)
+- `.github/workflows/static.yml` — `main` push 시 빌드·자가검증·GitHub Pages 배포
 
 콘텐츠나 레이아웃을 변경하는 에이전트는 먼저 [AGENTS.md](AGENTS.md)를 읽고 [운영 문서](docs/OPERATIONS.md)를 따르세요.
