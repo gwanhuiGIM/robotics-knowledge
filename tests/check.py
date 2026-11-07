@@ -59,7 +59,7 @@ def layout_unit():
     tpl = Template((ROOT / "tools/templates/article.html").read_text(encoding="utf-8"))
     _, page, _, _ = build.render_article(ROOT / "tests/fixtures/layout-sample.md", md, site, tpl)
     body = page.split('<div class="art-body">', 1)[1].split('<footer class="art-foot">', 1)[0]
-    check(body.count('class="lt-root"') == 1, "정상 레이아웃 블록 1개")
+    check(body.count('class="lt-root"') == 5, "정상 레이아웃 블록 5개")
     check(body.count("data-lucide=") == 3 and all(f'data-lucide="{n}"' in body for n in ("hammer", "check-check", "scan-search")),
           "{#each} 3회 반복 + 아이콘 이름 치환")
     check(all(f'<span class="tx tx-size-xs">{n}</span>' in body for n in ("빌드", "테스트", "코드 검사")), "{item.name} 글자 치환")
@@ -77,6 +77,13 @@ def layout_unit():
     check('class="lt-fallback"' in body and "닫히지 않은 블록 원문" in body, "닫히지 않은 블록은 원문 표시")
     check("<h2>다음 절</h2>" in body and "<p>닫히지 않은 블록 뒤 문단도 살아 있어야 함</p>" in body, "닫히지 않은 블록이 뒤 내용을 삼키지 않음")
     check("@@LAYOUT" not in body, "자리표시 잔존 없음")
+    check('<div class="lt-box"><p>잘못된 속성 타입</p>' in body, "배열·객체 속성 값은 버리고 블록은 렌더")
+    check('<code class="language-html">&lt;icon name="hammer"/&gt;' in body, "레이아웃 안 코드 fence는 글자")
+    check("&lt;box&gt;목록 안 코드 블록&lt;/box&gt;" in body, "목록 안 코드 fence는 변환하지 않음")
+    check('<code>&lt;Link url="https://example.com/raw" title="코드 안 링크"/&gt;</code>' in body, "인라인 코드 안 <Link>는 그대로")
+    check("<h2>상자 안 제목</h2>\n<p>상자 안 내용</p>" in body, "닫힌 블록 안 제목에서 블록이 끊기지 않음")
+    check('<span class="tx">a,b:c</span>' in body, "{#each} 문자열 안 콤마·콜론")
+    check("<p>후속 일반 문단도 살아 있어야 함</p>" in body, "닫히지 않은 블록이 뒤 일반 문단을 삼키지 않음")
     check("lucide.min.js" in page, "아이콘 스크립트 포함")
 
 

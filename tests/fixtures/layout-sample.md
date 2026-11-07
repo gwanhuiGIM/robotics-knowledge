@@ -43,6 +43,36 @@ tags: [test]
 <box gap={3}>코드 블록 안 태그는 그대로</box>
 ```
 
+<box align={[]} justify={{x:1}}>
+  잘못된 속성 타입
+</box>
+
+<box>
+```html
+<icon name="hammer"/>
+```
+</box>
+
+- ```html
+  <box>목록 안 코드 블록</box>
+  ```
+
+인라인 코드 `<Link url="https://example.com/raw" title="코드 안 링크"/>` 그대로.
+
+<box>
+## 상자 안 제목
+상자 안 내용
+</box>
+
+<row>
+{#each [{name:"a,b:c"}] as item}<text>{item.name}</text>{/each}
+</row>
+
+<row>
+  열린 행
+
+후속 일반 문단도 살아 있어야 함
+
 <box gap={2}>
   닫히지 않은 블록 원문
 

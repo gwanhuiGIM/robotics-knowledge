@@ -1,9 +1,9 @@
 """ChatGPT 답변의 레이아웃 태그(<box>, <row>, <grid>, <icon>, {#each} …)를 HTML로 바꾼다.
 
 ChatGPT 화면의 카드·흐름도는 Markdown 안에 섞인 JSX·Svelte 비슷한 태그로 쓰여 있다
-(2026-11-07 답변 공유 링크 원본에서 확인). 이 형식은 OpenAI의 비공개 사양이라 바뀔 수 있으므로:
+(2026-11-07 답변 공유 링크 원본에서 확인). 공개 문서를 찾지 못한 형식이라 바뀔 수 있으므로:
 - 아는 태그는 사이트 CSS 클래스로 그린다(모양은 근사치, 내용·배치 구조는 원문 그대로).
-- 모르는 태그는 상자로 감싸 안의 글자를 그대로 보여 주고 경고를 남긴다.
+- 레이아웃 블록 안의 모르는 태그는 상자로 감싸 안의 글자를 그대로 보여 주고 경고를 남긴다.
 - 블록 전체를 해석하지 못하면 원문 소스를 그대로 보여 주고 경고를 남긴다.
 
 보안: 태그 사이 글자는 markdown-it으로 렌더한 뒤 조각마다 sanitize한다. 이 모듈이 직접 만드는
@@ -123,6 +123,21 @@ def parse(src):
 
     while i < len(src):
         c = src[i]
+        if c in "`~":
+            # 코드 fence·인라인 코드 안의 태그는 해석하지 않고 글자로 넘긴다.
+            run = re.compile(re.escape(c) + "+").match(src, i).group(0)
+            line_start = src.rfind("\n", 0, i) + 1
+            if len(run) >= 3 and not src[line_start:i].strip(" \t>-*+0123456789.)"):
+                close = re.compile(r"\n[ \t>]*" + re.escape(c) * len(run) + re.escape(c) + r"*[ \t]*(?=\n|$)").search(src, i + len(run))
+                end = close.end() if close else len(src)
+            elif c == "`":
+                close = re.compile(r"(?<!`)" + "`" * len(run) + r"(?!`)").search(src, i + len(run))
+                end = close.end() if close else i + len(run)
+            else:
+                end = i + len(run)
+            buf.append(src[i:end])
+            i = end
+            continue
         if src.startswith("{#each", i):
             end = _balanced(src, i)
             m = re.fullmatch(r"\{#each\s+(.+)\s+as\s+([A-Za-z_]\w*)\s*\}", src[i:end], re.S)
@@ -186,11 +201,48 @@ def _js_value(expr, scope):
         for k in filter(None, m.group(2).split(".")):
             v = v.get(k) if isinstance(v, dict) else None
         return v
-    as_json = re.sub(r'([{,]\s*)([A-Za-z_$][\w$]*)\s*:', r'\1"\2":', expr)
+    as_json = _js_to_json(expr)
     try:
-        return json.loads(as_json)
+        return json.loads(as_json) if as_json is not None else None
     except ValueError:
         return None
+
+
+IDENT = re.compile(r"[A-Za-z_$][\w$]*")
+
+
+def _js_to_json(expr):
+    """객체 key의 따옴표 없는 이름에만 따옴표를 붙인다. 문자열 값 안의 'a,b:c'는 건드리지 않는다."""
+    out, i, n = [], 0, len(expr)
+    while i < n:
+        c = expr[i]
+        if c in "\"'":
+            j, body = i + 1, []
+            while j < n and expr[j] != c:
+                if expr[j] == "\\" and j + 1 < n:
+                    body.append(expr[j:j + 2])
+                    j += 2
+                    continue
+                body.append('\\"' if expr[j] == '"' else expr[j])
+                j += 1
+            if j >= n:
+                return None
+            out.append('"' + "".join(body).replace("\\'", "'") + '"')
+            i = j + 1
+            continue
+        m = IDENT.match(expr, i)
+        if m:
+            k = m.end()
+            while k < n and expr[k].isspace():
+                k += 1
+            prev = "".join(out).rstrip()[-1:]
+            is_key = k < n and expr[k] == ":" and prev in ("{", ",")
+            out.append(json.dumps(m.group(0)) if is_key else m.group(0))
+            i = m.end()
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
 
 
 def _attr(node, key, scope):
@@ -250,7 +302,7 @@ class Renderer:
                 cls.append(f"lt-{prefix}-{v}")
         for key, prefix in (("align", "al"), ("justify", "jc"), ("radius", "r")):
             v = _attr(node, key, scope)
-            if v in ENUM[key]:
+            if isinstance(v, str) and v in ENUM[key]:
                 cls.append(f"lt-{prefix}-{v}")
         bg = _attr(node, "background", scope)
         if isinstance(bg, str):
@@ -332,12 +384,13 @@ class Renderer:
 
 
 # ---------------------------------------------------------------- 원문에서 블록 찾기
-FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+# 목록(- , 1. )·인용(>) 안에서 여는 fence도 잡는다.
+FENCE = re.compile(r"^(?:\s*(?:[-*+]|\d+[.)])\s+|\s*>\s?)*\s*(`{3,}|~{3,})")
+CODE_SPAN = re.compile(r"(`+)(?!`).*?(?<!`)\1(?!`)")
 START = re.compile(r"^ {0,3}<(" + "|".join(sorted(BLOCK_TAGS, key=len, reverse=True)) + r")[\s/>]")
 LINK_INLINE = re.compile(r"<Link\s([^<>]*?)/?>")
 
 
-HEADING = re.compile(r"^#{1,6}\s")
 
 
 def _open(text):
@@ -367,6 +420,16 @@ def _link_to_md(m):
     return title
 
 
+def _links_outside_code(line):
+    """인라인 코드(`…`) 밖의 <Link …/>만 Markdown 링크로 바꾼다."""
+    out, last = [], 0
+    for m in CODE_SPAN.finditer(line):
+        out += [LINK_INLINE.sub(_link_to_md, line[last:m.start()]), m.group(0)]
+        last = m.end()
+    out.append(LINK_INLINE.sub(_link_to_md, line[last:]))
+    return "".join(out)
+
+
 def extract(body, nonce):
     """레이아웃 블록을 자리표시 문단으로 바꾼다. (바뀐 Markdown, [블록 원문…])."""
     lines = body.split("\n")
@@ -376,7 +439,7 @@ def extract(body, nonce):
         fm = FENCE.match(line)
         if fence:
             out.append(line)
-            if fm and fm.group(1)[0] == fence[0] and len(fm.group(1)) >= len(fence) and not line.strip()[len(fm.group(1)):].strip():
+            if fm and fm.group(1)[0] == fence[0] and len(fm.group(1)) >= len(fence) and not line[fm.end():].strip():
                 fence = None
             i += 1
             continue
@@ -387,14 +450,18 @@ def extract(body, nonce):
             continue
         if START.match(line):
             j = i + 1
-            # 닫히지 않은 블록이 글 끝까지 삼키지 않도록 Markdown 제목 줄 앞에서 멈춘다.
-            while j < len(lines) and not HEADING.match(lines[j]) and _open("\n".join(lines[i:j])):
+            while j < len(lines) and _open("\n".join(lines[i:j])):
                 j += 1
+            if _open("\n".join(lines[i:j])):
+                # 끝까지 닫히지 않았다 — 글 나머지를 삼키지 않도록 들여쓰지 않은 일반 줄(제목·문단) 앞에서 끊는다.
+                j = i + 1
+                while j < len(lines) and not (lines[j][:1].strip() and lines[j][0] not in "<{"):
+                    j += 1
             blocks.append("\n".join(lines[i:j]))
             out += ["", f"@@LAYOUT-{nonce}-{len(blocks) - 1}@@", ""]
             i = j
             continue
-        out.append(LINK_INLINE.sub(_link_to_md, line))
+        out.append(_links_outside_code(line))
         i += 1
     return "\n".join(out), blocks
 
@@ -408,8 +475,8 @@ def render_blocks(html_body, blocks, nonce, md, env, clean):
             frag = f'<div class="lt-root">{r.children(parse(src), {})}</div>'
             env["has_icons"] = env.get("has_icons") or "data-lucide=" in frag
             warnings += r.warnings
-        except LayoutError as e:
-            warnings.append(f"레이아웃 블록 {n + 1} 해석 실패({e}) — 원문 소스를 표시")
+        except Exception as e:  # 해석 오류뿐 아니라 예상 못 한 값도 글 전체가 아니라 이 블록만 원문 표시로 떨어뜨린다
+            warnings.append(f"레이아웃 블록 {n + 1} 해석 실패({type(e).__name__}: {e}) — 원문 소스를 표시")
             frag = ('<div class="lt-fallback"><p class="lt-fallback__note">레이아웃 태그를 해석하지 못해 원문 소스를 그대로 표시합니다.</p>'
                     f'<pre><code>{html.escape(src)}</code></pre></div>')
         token = f"@@LAYOUT-{nonce}-{n}@@"
