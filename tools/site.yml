@@ -1,0 +1,15 @@
+# 사이트 허용 값의 단일 출처. tools/build.py와 docs/AUTHORING.md가 이 파일을 기준으로 한다.
+# 값을 추가·변경하면 홈 사이드바(tools/templates/index.html의 data-filter 버튼)도 함께 맞춘다.
+
+categories:            # front matter `category` 허용 값 → 카드 상단 라벨
+  Simulation: SIMULATION
+  Control: ROBOT CONTROL
+  Embodied AI: EMBODIED AI
+  Systems: SYSTEMS
+
+content_modes:         # front matter `content_mode` 허용 값 → 화면 라벨
+  original_qa: 원문 Q&A          # 사용자 질문 + 실제로 확보한 ChatGPT 답변 원문
+  new_answer: 새로 생성한 답변     # 질문·주제만 받고 게시 시 새로 작성한 답변
+  reconstructed: 재구성 답변       # 과거 답변 원문을 확보하지 못해 다시 구성한 답변
+
+required_fields: [title, category, content_mode, published, summary]
