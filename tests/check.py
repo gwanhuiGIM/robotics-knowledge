@@ -2,7 +2,8 @@
 """빌드 자가검증. 사용: python tests/check.py [--site _site]
 
 1) 렌더러 단위 시험 — tests/fixtures/visual-sample.md를 렌더해 수식·Mermaid·Alert·표·sanitize를 확인,
-   tests/fixtures/layout-sample.md로 ChatGPT 레이아웃 태그(반복·속성 검증·sanitize·원문 표시 대체)를 확인
+   tests/fixtures/layout-sample.md로 ChatGPT 레이아웃 태그(반복·속성 검증·sanitize·원문 표시 대체)를 확인,
+   tests/fixtures/widget-sample.md로 ChatGPT 화면 위젯(Entity·Cite·AsyncImage·Chart)을 확인
 2) 사이트 시험(--site) — 홈 카드 href가 모두 존재, 카드 수 = 기존 카드 + 생성 글, 생성 글에 reader 자산 포함
 실패하면 종료 코드 1. 배포를 막지 않으려면 workflow에서 continue-on-error로 둔다.
 """
@@ -87,6 +88,43 @@ def layout_unit():
     check("lucide.min.js" in page, "아이콘 스크립트 포함")
 
 
+# 태그가 렌더되지 않고 글자로 새어 나온 흔적(코드·수식 밖): <Name attr="…"·attr={…}> 또는 <Name/>
+# 속성 값이 따옴표·중괄호로 시작할 때만 잡는다 — 부등식(a<b x=1)을 오탐하지 않게.
+LEAK = re.compile(r"&lt;[A-Za-z][\w-]*(?:\s+[A-Za-z_][\w-]*=(?:\{|&quot;|\"|')|\s*/&gt;)")
+CODE = re.compile(r"<pre[\s>].*?</pre>|<code[\s>].*?</code>|<span class=\"math-inline\">.*?</span>|<div class=\"math-display\">.*?</div>", re.S)
+
+
+def leaks(body):
+    """코드·수식 밖에 글자로 남은 태그, 짝을 잃은 굵게 표시(**) 목록.
+    못 잡는 것: 블록 밖의 따옴표 속성 태그(<Foo value="…"/>)는 sanitize가 경고 없이 지운다."""
+    text = CODE.sub("", body)
+    return LEAK.findall(text) + re.findall(r"<p>\*\*</p>", text)
+
+
+def widget_unit():
+    """ChatGPT 화면 위젯 — tests/fixtures/widget-sample.md."""
+    site = build.load_site()
+    md = build.make_md()
+    tpl = Template((ROOT / "tools/templates/article.html").read_text(encoding="utf-8"))
+    _, page, _, _ = build.render_article(ROOT / "tests/fixtures/widget-sample.md", md, site, tpl)
+    body = page.split('<div class="art-body">', 1)[1].split('<footer class="art-foot">', 1)[0]
+    check(not leaks(body), f"위젯 태그가 글자로 남음: {leaks(body)[:3]}")
+    check("turn" not in CODE.sub("", body), "Cite 출처 id는 지움")
+    check("<strong>Anvil Robotics OpenYAM</strong>" in body, "**<Entity/>** → 굵은 value")
+    check("<p>들여쓴 설명 문단입니다.</p>" in body and "<pre><code>들여쓴" not in body, "Entity 뒤 들여쓴 문단이 코드 블록이 되지 않음")
+    check("블록 밖 개체 Out*Side Robot 끝." in body, "블록 밖 Entity → value(Markdown 특수문자 그대로)")
+    check("<p>블록 밖 문단 <strong>굵게</strong>입니다.</p>" in body, "블록 밖 Cite 삭제")
+    check("AsyncImage" not in CODE.sub("", body) and "robot a" not in body, "AsyncImage·AsyncImageGroup 삭제")
+    check('<th>1세대</th><td>22.6</td>' in body and '<th>Sage</th><td>340.3</td>' in body and "개입 간격 (초)" in body,
+          "Chart → 데이터 표")
+    check("<figcaption>자료: 예시 &lt;b&gt;</figcaption>" in body, "Chart footer 이스케이프")
+    check('<div class="lt-caption">캡션 글자</div>' in body, "caption 안 Cite 삭제")
+    check('<code>&lt;Cite ref="code"/&gt;</code>' in body, "인라인 코드 안 위젯은 그대로")
+    check('class="lt-unknown"' not in body, "위젯이 모르는 태그 상자로 떨어지지 않음")
+    check("Lt&amp;Gt &lt;b&gt;" in body, "Entity value의 &·< 는 한 번만 이스케이프")
+    check(not leaks("<p>a&lt;b x=1 이고 c&lt;d</p><span class=\"math-inline\">a&lt;b c=d</span>"), "부등식·수식은 누출로 보지 않음")
+
+
 def site_check(out):
     index = (out / "index.html").read_text(encoding="utf-8")
     hrefs = re.findall(r'<a class="article"[^>]*href="([^"]+)"', index)
@@ -104,6 +142,9 @@ def site_check(out):
         if p.is_file():
             t = p.read_text(encoding="utf-8")
             check("../assets/reader.js" in t and "../assets/reader.css" in t, f"reader 자산 누락: {p.name}")
+            found = leaks(t.split('<div class="art-body">', 1)[-1])
+            check(not found, f"태그가 글자로 남음: {p.name} → {found[:3]}")
+            check('class="lt-unknown"' not in t, f"모르는 레이아웃 태그가 있음(빌드 ::warning 확인): {p.name}")
             for src in re.findall(r'<img [^>]*src="([^"]+)"', t):
                 if not src.startswith("http"):
                     check((p.parent / src).resolve().is_file(), f"이미지 없음: {p.name} → {src}")
@@ -117,6 +158,7 @@ def main():
     a = ap.parse_args()
     unit()
     layout_unit()
+    widget_unit()
     if a.site:
         site_check((ROOT / a.site).resolve())
     for f in fails:
