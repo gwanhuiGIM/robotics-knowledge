@@ -12,6 +12,10 @@ summary: "Entity·Cite·AsyncImage·Chart 처리 시험용 fixture"
 
 블록 밖 개체 <Entity category="product" value="Out*Side Robot" disambig="x"/> 끝.
 
+<box>
+  특수문자 <Entity value="Lt&Gt <b>"/> 끝
+</box>
+
 <row align=start gap={3}>
   <AsyncImage query="robot arm" aspectRatio="4:5" maxWidth="180px"/>
   <box flex="1" gap={2}>

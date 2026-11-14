@@ -88,13 +88,15 @@ def layout_unit():
     check("lucide.min.js" in page, "아이콘 스크립트 포함")
 
 
-# 태그가 렌더되지 않고 글자로 새어 나온 흔적(코드 밖): <Name attr=…> 또는 <Name/>
-LEAK = re.compile(r"&lt;[A-Za-z][\w-]*(?:\s+[A-Za-z_][\w-]*=|\s*/&gt;)")
-CODE = re.compile(r"<pre[\s>].*?</pre>|<code[\s>].*?</code>", re.S)
+# 태그가 렌더되지 않고 글자로 새어 나온 흔적(코드·수식 밖): <Name attr="…"·attr={…}> 또는 <Name/>
+# 속성 값이 따옴표·중괄호로 시작할 때만 잡는다 — 부등식(a<b x=1)을 오탐하지 않게.
+LEAK = re.compile(r"&lt;[A-Za-z][\w-]*(?:\s+[A-Za-z_][\w-]*=(?:\{|&quot;|\"|')|\s*/&gt;)")
+CODE = re.compile(r"<pre[\s>].*?</pre>|<code[\s>].*?</code>|<span class=\"math-inline\">.*?</span>|<div class=\"math-display\">.*?</div>", re.S)
 
 
 def leaks(body):
-    """코드 밖에 글자로 남은 태그, 짝을 잃은 굵게 표시(**) 목록."""
+    """코드·수식 밖에 글자로 남은 태그, 짝을 잃은 굵게 표시(**) 목록.
+    못 잡는 것: 블록 밖의 따옴표 속성 태그(<Foo value="…"/>)는 sanitize가 경고 없이 지운다."""
     text = CODE.sub("", body)
     return LEAK.findall(text) + re.findall(r"<p>\*\*</p>", text)
 
@@ -119,6 +121,8 @@ def widget_unit():
     check('<div class="lt-caption">캡션 글자</div>' in body, "caption 안 Cite 삭제")
     check('<code>&lt;Cite ref="code"/&gt;</code>' in body, "인라인 코드 안 위젯은 그대로")
     check('class="lt-unknown"' not in body, "위젯이 모르는 태그 상자로 떨어지지 않음")
+    check("Lt&amp;Gt &lt;b&gt;" in body, "Entity value의 &·< 는 한 번만 이스케이프")
+    check(not leaks("<p>a&lt;b x=1 이고 c&lt;d</p><span class=\"math-inline\">a&lt;b c=d</span>"), "부등식·수식은 누출로 보지 않음")
 
 
 def site_check(out):
@@ -140,6 +144,7 @@ def site_check(out):
             check("../assets/reader.js" in t and "../assets/reader.css" in t, f"reader 자산 누락: {p.name}")
             found = leaks(t.split('<div class="art-body">', 1)[-1])
             check(not found, f"태그가 글자로 남음: {p.name} → {found[:3]}")
+            check('class="lt-unknown"' not in t, f"모르는 레이아웃 태그가 있음(빌드 ::warning 확인): {p.name}")
             for src in re.findall(r'<img [^>]*src="([^"]+)"', t):
                 if not src.startswith("http"):
                     check((p.parent / src).resolve().is_file(), f"이미지 없음: {p.name} → {src}")

@@ -432,10 +432,10 @@ WIDGET_INLINE = re.compile(r"<(Entity|Cite)\s[^<>]*?/>")
 
 
 def _inline_text(name, attrs):
-    """INLINE_TEXT 위젯을 Markdown 글자로. Entity는 value(HTML·Markdown 특수문자 이스케이프), Cite는 빈 글자."""
+    """INLINE_TEXT 위젯을 Markdown 글자로. Entity는 value(Markdown 백슬래시 이스케이프 — HTML 이스케이프를 겹치면 &lt;가 글자로 보임), Cite는 빈 글자."""
     if name == "Entity":
         v = attrs.get("value")
-        return re.sub(r"([\\`*_\[\]#|~])", r"\\\1", html.escape(str(v))) if isinstance(v, str) else ""
+        return re.sub(r"([\\`*_\[\]#|~<>&])", r"\\\1", v) if isinstance(v, str) else ""
     return ""
 
 
