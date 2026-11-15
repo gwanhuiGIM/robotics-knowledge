@@ -1,6 +1,6 @@
 ---
 title: "ChatGPT 위젯 태그 시험"
-category: Systems
+category: Embodied AI
 content_mode: original_qa
 published: 2026-11-14
 summary: "Entity·Cite·AsyncImage·Chart 처리 시험용 fixture"
