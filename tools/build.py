@@ -125,6 +125,19 @@ def make_md():
             kind = m.group(1)
             t.attrSet("class", f"alert alert-{kind.lower()}")  # 라벨 글자는 article.css의 ::before
             inline.content = inline.content[m.end():]
+            if kind == "PROMPT":
+                # 홈 목록용 질문 원문: 이 인용 블록 안의 문단·코드를 순서대로 모은다.
+                # (PROMPT 밖 코드 블록 안에 적힌 "> [!PROMPT]" 예시는 blockquote 토큰이 아니라 해당 없음)
+                parts, depth = [], 0
+                for u in toks[i:]:
+                    depth += u.nesting if u.type.startswith("blockquote") else 0
+                    if u.type == "inline" and u.content.strip():
+                        parts.append(u.content.strip())
+                    elif u.type in ("fence", "code_block") and u.content.strip():
+                        parts.append(u.content.rstrip("\n"))
+                    if depth == 0:
+                        break
+                state.env.setdefault("prompts", []).append("\n\n".join(parts))
 
     md.core.ruler.before("inline", "alerts", alerts)
     return md
@@ -187,6 +200,9 @@ def validate(meta, site):
     missing = [f for f in site["required_fields"] if not meta.get(f)]
     if missing:
         raise ArticleError(f"필수 필드 누락: {', '.join(missing)}")
+    retired = site.get("retired_categories") or {}
+    if meta["category"] in retired:
+        raise ArticleError(f"category {meta['category']!r}는 더 이상 쓰지 않음({retired[meta['category']]}) (허용: {list(site['categories'])})")
     if meta["category"] not in site["categories"]:
         raise ArticleError(f"category 허용 값 아님: {meta['category']!r} (허용: {list(site['categories'])})")
     if meta["content_mode"] not in site["content_modes"]:
@@ -245,19 +261,65 @@ def render_article(path, md, site, tpl):
         source_note=esc(meta.get("source_note") or ""),
         head_extra=head_extra, tail_extra=tail_extra,
     )
-    card = make_card(slug, meta, site)
-    return slug, page, card, meta["published"]
+    qs = env.get("prompts") or []
+    item = make_item(slug, dict(meta, questions=qs, date=meta["published"],
+                                mode=site["content_modes"][meta["content_mode"]]), site)
+    return slug, page, (meta["category"], bool(qs), item), meta["published"]
 
 
-def make_card(slug, meta, site):
+def make_item(slug, it, site):
+    """홈 목록 한 항목. legacy(tools/legacy_cards.yml)와 content 글이 같은 함수로 그려진다.
+
+    it: title, summary, category, tags, questions, 선택 label·card_label·mode·content_mode·keywords·jd·search
+    <a> 안에 <details>를 둘 수 없어(인터랙티브 중첩) 링크는 제목에만 둔다.
+    """
     esc = html.escape
-    search = " ".join([meta.get("keywords") or "", " ".join(meta["tags"]), " ".join(meta["jd"])]).lower()
-    label = site["categories"][meta["category"]] + ((" · " + meta["card_label"]) if meta.get("card_label") else "")
-    tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in meta["tags"])
-    return (f'<a class="article" data-category="{esc(meta["category"])}" data-search="{esc(search)}" '
-            f'href="articles/{slug}.html"><div class="category">{esc(label)}'
-            f'<span class="mode mode-{meta["content_mode"]}">{esc(site["content_modes"][meta["content_mode"]])}</span></div>'
-            f'<h2>{esc(meta["title"])}</h2><p>{esc(meta["summary"])}</p>{tags}</a>')
+    label = it.get("label") if it.get("label") is not None else (it.get("card_label") or "")
+    search = it.get("search")
+    if search is None:
+        search = " ".join([it.get("keywords") or "", " ".join(it.get("tags") or []), " ".join(it.get("jd") or [])])
+    # 질문은 문자열, 또는 원 글이 질문 출처에 단서를 단 경우 {text, note}(note는 원 글의 문구 그대로)
+    qs = [(q, "") if isinstance(q, str) else (q["text"], q.get("note") or "") for q in it.get("questions") or []]
+
+    def qbox(text, note):
+        return (f'<blockquote class="q"><p>{esc(text)}</p>'
+                + (f'<small class="q-note">{esc(note)}</small>' if note else "") + "</blockquote>")
+    href = f"articles/{slug}.html"
+    head = (f'<div class="item-head"><a class="item-link" href="{href}"><h3>{esc(it["title"])}</h3></a>'
+            + (f'<span class="item-label">{esc(label)}</span>' if label else "")
+            + (f'<span class="mode mode-{esc(it["content_mode"])}">{esc(it["mode"])}</span>' if it.get("mode") else "")
+            + "</div>")
+    if qs:
+        q = qbox(*qs[0])
+        if len(qs) > 1:
+            more = "".join(qbox(*x) for x in qs[1:])
+            q += f'<details class="more-q"><summary>질문 {len(qs) - 1}개 더 보기</summary>{more}</details>'
+    else:
+        q = '<p class="q q-none">질문 원문 미확보</p>'
+    tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in it.get("tags") or [])
+    return (f'<article class="item" data-category="{esc(it["category"])}" data-search="{esc(search)}" '
+            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">{head}{q}'
+            f'<p class="sum">{esc(it["summary"])}</p>'
+            f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
+
+
+def render_home(items, site):
+    """items: (date, order, category, has_question, html). 분야 순서는 site.yml, 분야 안은 최신순."""
+    esc = html.escape
+    items = sorted(items, key=lambda c: (c[0], -c[1]), reverse=True)
+    chips = [f'<button class="chip active" data-filter="all">전체 <b>{len(items)}</b></button>']
+    sections = []
+    for key, label in site["categories"].items():
+        group = [c for c in items if c[2] == key]
+        if not group:
+            continue
+        chips.append(f'<button class="chip" data-filter="{esc(key)}">{esc(label)} <b>{len(group)}</b></button>')
+        sections.append(f'<section class="cat" data-section="{esc(key)}"><h2>{esc(label)} <span>{len(group)}</span></h2>'
+                        + "\n".join(c[4] for c in group) + "</section>")
+    stats = (f'글 <b>{len(items)}</b> · 분야 <b>{len(sections)}</b> · '
+             f'질문 원문이 있는 글 <b>{sum(1 for c in items if c[3])}</b>')
+    return {"<!--INTRO-->": esc(site.get("intro") or ""), "<!--STATS-->": stats,
+            "<!--CHIPS-->": "".join(chips), "<!--SECTIONS-->": "\n".join(sections)}
 
 
 def copy_static(out):
@@ -284,10 +346,12 @@ def build(out):
     copy_static(out)
     (out / "articles").mkdir(exist_ok=True)
 
-    cards = []  # (date, order, html)
+    cards = []  # (date, order, category, has_question, html)
     legacy = yaml.safe_load((TOOLS / "legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
     for i, c in enumerate(legacy):
-        cards.append((c["date"], i, c["html"]))
+        if c["category"] not in site["categories"]:
+            raise SystemExit(f"tools/legacy_cards.yml {c['slug']}: category 허용 값 아님 {c['category']!r}")
+        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site)))
 
     built, failed = [], []
     for path in sorted((ROOT / "content").glob("*.md")):
@@ -297,15 +361,16 @@ def build(out):
             if (ROOT / "articles" / f"{slug}.html").exists():
                 raise ArticleError(f"articles/{slug}.html(legacy)과 이름이 겹칩니다")
             (out / "articles" / f"{slug}.html").write_text(page, encoding="utf-8")
-            cards.append((published, len(cards), card))
+            cards.append((str(published), len(cards), *card))
             built.append(str(rel))
         except Exception as e:  # 글 하나의 실패가 사이트 전체 배포를 막지 않게 한다
             warn(rel, f"이 글은 배포에서 제외됨 — {e}")
             failed.append(str(rel))
 
-    cards.sort(key=lambda c: (c[0], -c[1]), reverse=True)
     index = (TOOLS / "templates" / "index.html").read_text(encoding="utf-8")
-    index = index.replace("<!--CARDS-->", "\n".join(c[2] for c in cards))
+    for mark, val in render_home(cards, site).items():
+        assert index.count(mark) == 1, f"templates/index.html 자리표시 {mark}가 1개가 아님"
+        index = index.replace(mark, val)
     (out / "index.html").write_text(index, encoding="utf-8")
     print(f"built {len(built)} article(s), {len(cards)} card(s), failed {len(failed)}")
     for f in failed:

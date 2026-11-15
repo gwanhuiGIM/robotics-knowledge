@@ -1,6 +1,6 @@
 ---
 title: "시각자료 시험"
-category: Systems
+category: ROS 2
 content_mode: new_answer
 published: 2026-11-07
 summary: "렌더러 회귀 시험용 샘플"

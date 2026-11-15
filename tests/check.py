@@ -50,7 +50,22 @@ def unit():
     check('href="https://example.com"' in body, "정상 링크 유지")
     check("katex.min.js" in page and "mermaid.min.js" in page and "reader.js" in page and "article.js" in page, "필요 스크립트 포함")
     check("JD 핵심 문장" in page and "요약 · 게시 시 작성" in page, "요약·JD 상자")
-    check('mode-new_answer' in card and 'data-category="Systems"' in card, "카드 라벨")
+    cat, has_q, item = card
+    check(cat == "ROS 2" and 'mode-new_answer' in item and 'data-category="ROS 2"' in item, "홈 항목 라벨·분야")
+    check(item.count("<a ") == 1 and '<a class="item-link"' in item and "<details" not in item.split("</a>")[0],
+          "링크는 제목에만(<a> 안에 <details> 금지)")
+    # [!PROMPT] → 홈 질문: 순서·여러 문단·escape, 코드 블록 안 예시와 NOTE는 제외
+    _, _, (_, has_q, item), _ = build.render_article(ROOT / "tests/fixtures/prompt-sample.md", md, site, tpl)
+    qs = re.findall(r'<blockquote class="q"><p>(.*?)</p></blockquote>', item, re.S)
+    check(has_q and qs == ["첫 질문 &amp; &lt;꺾쇠&gt;", "두 번째 질문 첫 문단\n\n두 번째 질문 둘째 문단",
+                           "이 코드 설명해줘\n\nprint(1)"], f"질문 추출(질문 안 코드 포함): {qs}")
+    check("질문 2개 더 보기" in item and "코드 블록 안" not in item and "참고는" not in item, "질문 추출 범위")
+    try:
+        build.validate({"title": "t", "category": "Systems", "content_mode": "new_answer",
+                        "published": "2026-11-14", "summary": "s"}, site)
+        check(False, "옛 분야 Systems가 통과하면 안 됨")
+    except build.ArticleError as e:
+        check("더 이상 쓰지 않음" in str(e), f"옛 분야 안내 문구: {e}")
 
 
 def layout_unit():
@@ -127,7 +142,47 @@ def widget_unit():
 
 def site_check(out):
     index = (out / "index.html").read_text(encoding="utf-8")
-    hrefs = re.findall(r'<a class="article"[^>]*href="([^"]+)"', index)
+    hrefs = re.findall(r'<a class="item-link" href="([^"]+)"', index)
+    items = re.findall(r'<article class="item" data-category="([^"]+)".*?</article>', index, re.S)
+    check(len(items) == len(hrefs), f"항목 {len(items)} != 링크 {len(hrefs)}")
+    # 분야 칩 숫자 = 섹션 안 실제 항목 수, 0개 분야 칩 없음
+    site = build.load_site()
+    for key in site["categories"]:
+        n = items.count(key)
+        k = re.escape(build.html.escape(key))
+        chip = re.search(r'data-filter="%s">[^<]*<b>(\d+)</b>' % k, index)
+        sec = re.search(r'<section class="cat" data-section="%s">(.*?)</section>' % k, index, re.S)
+        if n == 0:
+            check(chip is None and sec is None, f"글 0개 분야가 홈에 나옴: {key}")
+        else:
+            check(chip is not None and int(chip.group(1)) == n, f"칩 숫자 불일치: {key}")
+            check(sec is not None and sec.group(1).count('<article class="item"') == n, f"섹션 항목 수 불일치: {key}")
+    in_sec = sum(m.count('<article class="item"') for m in re.findall(r'<section class="cat".*?</section>', index, re.S))
+    check(in_sec == len(items), "섹션 밖 항목 있음")
+    total = re.search(r'data-filter="all">[^<]*<b>(\d+)</b>', index)
+    check(total is not None and int(total.group(1)) == len(items), "전체 칩 숫자 불일치")
+
+    # 질문이 그 글의 항목 안, 화면의 질문 상자에 순서대로 그대로 있는지(data-q에만 있거나 다른 글로 옮겨지면 실패)
+    def shown_in(slug):
+        for a in re.findall(r'<article class="item".*?</article>', index, re.S):
+            if f'href="articles/{slug}.html"' in a:
+                return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p>', a, re.S)], a
+        return None, ""
+    for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]:
+        want = [q if isinstance(q, str) else q["text"] for q in c.get("questions") or []]
+        got, a = shown_in(c["slug"])
+        check(got == want, f"홈 질문 불일치: {c['slug']}")
+        for q in c.get("questions") or []:
+            if not isinstance(q, str) and q.get("note"):
+                check(build.html.escape(q["note"]) in a, f"질문 단서 표시 없음: {c['slug']}")
+        if not want:
+            check("q-none" in a, f"질문 없음 표시 없음: {c['slug']}")
+    md = build.make_md()
+    for p in (ROOT / "content").glob("*.md"):
+        env = {}
+        md.render(build.split_front_matter(p.read_text(encoding="utf-8"), p)[1], env)
+        got, _ = shown_in(p.stem)
+        check(got == (env.get("prompts") or []), f"홈 질문 불일치(content): {p.stem}")
     legacy = len(build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"])
     content = len(list((ROOT / "content").glob("*.md")))
     check(len(hrefs) == legacy + content, f"카드 수 {len(hrefs)} != 기존 {legacy} + 생성 {content}")
