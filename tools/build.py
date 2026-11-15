@@ -126,12 +126,15 @@ def make_md():
             t.attrSet("class", f"alert alert-{kind.lower()}")  # 라벨 글자는 article.css의 ::before
             inline.content = inline.content[m.end():]
             if kind == "PROMPT":
-                # 홈 목록용 질문 원문: 이 인용 블록 안의 문단을 순서대로 모은다(코드 블록 안 예시는 fence라 해당 없음).
+                # 홈 목록용 질문 원문: 이 인용 블록 안의 문단·코드를 순서대로 모은다.
+                # (PROMPT 밖 코드 블록 안에 적힌 "> [!PROMPT]" 예시는 blockquote 토큰이 아니라 해당 없음)
                 parts, depth = [], 0
                 for u in toks[i:]:
                     depth += u.nesting if u.type.startswith("blockquote") else 0
                     if u.type == "inline" and u.content.strip():
                         parts.append(u.content.strip())
+                    elif u.type in ("fence", "code_block") and u.content.strip():
+                        parts.append(u.content.rstrip("\n"))
                     if depth == 0:
                         break
                 state.env.setdefault("prompts", []).append("\n\n".join(parts))
@@ -275,22 +278,27 @@ def make_item(slug, it, site):
     search = it.get("search")
     if search is None:
         search = " ".join([it.get("keywords") or "", " ".join(it.get("tags") or []), " ".join(it.get("jd") or [])])
-    qs = it.get("questions") or []
+    # 질문은 문자열, 또는 원 글이 질문 출처에 단서를 단 경우 {text, note}(note는 원 글의 문구 그대로)
+    qs = [(q, "") if isinstance(q, str) else (q["text"], q.get("note") or "") for q in it.get("questions") or []]
+
+    def qbox(text, note):
+        return (f'<blockquote class="q"><p>{esc(text)}</p>'
+                + (f'<small class="q-note">{esc(note)}</small>' if note else "") + "</blockquote>")
     href = f"articles/{slug}.html"
     head = (f'<div class="item-head"><a class="item-link" href="{href}"><h3>{esc(it["title"])}</h3></a>'
             + (f'<span class="item-label">{esc(label)}</span>' if label else "")
             + (f'<span class="mode mode-{esc(it["content_mode"])}">{esc(it["mode"])}</span>' if it.get("mode") else "")
             + "</div>")
     if qs:
-        q = f'<blockquote class="q"><p>{esc(qs[0])}</p></blockquote>'
+        q = qbox(*qs[0])
         if len(qs) > 1:
-            more = "".join(f'<blockquote class="q"><p>{esc(x)}</p></blockquote>' for x in qs[1:])
+            more = "".join(qbox(*x) for x in qs[1:])
             q += f'<details class="more-q"><summary>질문 {len(qs) - 1}개 더 보기</summary>{more}</details>'
     else:
         q = '<p class="q q-none">질문 원문 미확보</p>'
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in it.get("tags") or [])
     return (f'<article class="item" data-category="{esc(it["category"])}" data-search="{esc(search)}" '
-            f'data-q="{esc(" ".join(qs).lower())}">{head}{q}'
+            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">{head}{q}'
             f'<p class="sum">{esc(it["summary"])}</p>'
             f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
 

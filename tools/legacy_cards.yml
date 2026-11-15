@@ -3,6 +3,7 @@
 # date: 해당 articles/*.html이 저장소에 처음 추가된 날짜(git log 기준). 홈 정렬(최신순)에만 쓴다.
 # label: 옛 카드 라벨에서 분야 이름(과 새 분야와 겹치는 앞머리)을 뗀 나머지.
 # search: 옛 카드 data-search 그대로. questions: articles/<slug>.html의 질문 요소 텍스트 그대로(오타 포함, 고치지 않음).
+#   원 글이 질문 출처에 단서를 달았으면 {text, note}로 쓰고 note에 원 글 문구를 그대로 옮긴다(홈 질문 상자 아래 표시).
 cards:
   - slug: m0609-liquid-transport-team-skills
     date: '2026-11-03'
@@ -85,7 +86,8 @@ cards:
     - ROS 2
     search: 엣지디바이스 엣지 컴퓨팅 jetson orin nano pc ros2 amr 휴머노이드 드론 distributed computing lidar yolo perception nav2
     questions:
-    - 엣지디바이스 환경
+    - text: 엣지디바이스 환경
+      note: 입력 텍스트 첫머리 · 정확한 사용자 질문 형식 미확인
     - 그럼 기존에 pc 한대로 센서도 켜고 통신받아서 연산하던 기존 구조에서, jetson orin nano등에서 모델 처리 후 pc로 전송하여 판단하는 로직으로 구성할 수 있나? 그러면 리소스 및 데이터 병목을 분배해 문제를 개선할 수 있는건가
     - 결국 연산노드 및 장치의 분리, 분배의 강점이라는거지? 실제 로보틱스 현장 및 제품에는 어떤 방식으로 적용되지? amr이나 휴머노이드, 드론 등에서
   - slug: omniverse-practical-experience

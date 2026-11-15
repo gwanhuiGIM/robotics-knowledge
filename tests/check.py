@@ -57,8 +57,9 @@ def unit():
     # [!PROMPT] → 홈 질문: 순서·여러 문단·escape, 코드 블록 안 예시와 NOTE는 제외
     _, _, (_, has_q, item), _ = build.render_article(ROOT / "tests/fixtures/prompt-sample.md", md, site, tpl)
     qs = re.findall(r'<blockquote class="q"><p>(.*?)</p></blockquote>', item, re.S)
-    check(has_q and qs == ["첫 질문 &amp; &lt;꺾쇠&gt;", "두 번째 질문 첫 문단\n\n두 번째 질문 둘째 문단"], f"질문 추출: {qs}")
-    check("질문 1개 더 보기" in item and "코드 블록 안" not in item and "참고는" not in item, "질문 추출 범위")
+    check(has_q and qs == ["첫 질문 &amp; &lt;꺾쇠&gt;", "두 번째 질문 첫 문단\n\n두 번째 질문 둘째 문단",
+                           "이 코드 설명해줘\n\nprint(1)"], f"질문 추출(질문 안 코드 포함): {qs}")
+    check("질문 2개 더 보기" in item and "코드 블록 안" not in item and "참고는" not in item, "질문 추출 범위")
     try:
         build.validate({"title": "t", "category": "Systems", "content_mode": "new_answer",
                         "published": "2026-11-14", "summary": "s"}, site)
@@ -158,11 +159,30 @@ def site_check(out):
             check(sec is not None and sec.group(1).count('<article class="item"') == n, f"섹션 항목 수 불일치: {key}")
     in_sec = sum(m.count('<article class="item"') for m in re.findall(r'<section class="cat".*?</section>', index, re.S))
     check(in_sec == len(items), "섹션 밖 항목 있음")
-    # legacy 질문이 화면의 질문 상자 안에 그대로 있는지(data-q에만 있으면 실패)
-    shown = [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p></blockquote>', index, re.S)]
+    total = re.search(r'data-filter="all">[^<]*<b>(\d+)</b>', index)
+    check(total is not None and int(total.group(1)) == len(items), "전체 칩 숫자 불일치")
+
+    # 질문이 그 글의 항목 안, 화면의 질문 상자에 순서대로 그대로 있는지(data-q에만 있거나 다른 글로 옮겨지면 실패)
+    def shown_in(slug):
+        for a in re.findall(r'<article class="item".*?</article>', index, re.S):
+            if f'href="articles/{slug}.html"' in a:
+                return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p>', a, re.S)], a
+        return None, ""
     for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]:
+        want = [q if isinstance(q, str) else q["text"] for q in c.get("questions") or []]
+        got, a = shown_in(c["slug"])
+        check(got == want, f"홈 질문 불일치: {c['slug']}")
         for q in c.get("questions") or []:
-            check(q in shown, f"홈에 질문 표시 없음: {c['slug']}: {q[:20]}")
+            if not isinstance(q, str) and q.get("note"):
+                check(build.html.escape(q["note"]) in a, f"질문 단서 표시 없음: {c['slug']}")
+        if not want:
+            check("q-none" in a, f"질문 없음 표시 없음: {c['slug']}")
+    md = build.make_md()
+    for p in (ROOT / "content").glob("*.md"):
+        env = {}
+        md.render(build.split_front_matter(p.read_text(encoding="utf-8"), p)[1], env)
+        got, _ = shown_in(p.stem)
+        check(got == (env.get("prompts") or []), f"홈 질문 불일치(content): {p.stem}")
     legacy = len(build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"])
     content = len(list((ROOT / "content").glob("*.md")))
     check(len(hrefs) == legacy + content, f"카드 수 {len(hrefs)} != 기존 {legacy} + 생성 {content}")
