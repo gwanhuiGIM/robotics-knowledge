@@ -5,6 +5,10 @@ ChatGPT 화면의 카드·흐름도는 Markdown 안에 섞인 JSX·Svelte 비슷
 - 아는 태그는 사이트 CSS 클래스로 그린다(모양은 근사치, 내용·배치 구조는 원문 그대로).
 - 레이아웃 블록 안의 모르는 태그는 상자로 감싸 안의 글자를 그대로 보여 주고 경고를 남긴다.
 - 블록 전체를 해석하지 못하면 원문 소스를 그대로 보여 주고 경고를 남긴다.
+- ChatGPT 화면 전용 위젯(2026-11-14 BC·DAgger 글 원문에서 확인)은 글에 담긴 정보만 남긴다:
+  <Entity value=…/>는 value 글자, <Cite …/>는 출처 id(turn…)라 사이트에서 열 수 없으므로 지움,
+  <AsyncImage>·<AsyncImageGroup>은 화면 표시 때 검색어로 불러오는 그림이라 원문에 그림이 없으므로 지움,
+  <Chart content={…}/>는 원문 데이터를 표로 그린다. 블록 밖 문단의 <Entity>·<Cite>도 같은 규칙으로 바꾼다.
 
 보안: 태그 사이 글자는 markdown-it으로 렌더한 뒤 조각마다 sanitize한다. 이 모듈이 직접 만드는
 속성(class, style, data-lucide, href)은 허용 목록·정규식으로 검증한 값만 쓴다.
@@ -15,8 +19,11 @@ import re
 import textwrap
 
 # 줄 맨 앞에 오면 레이아웃 블록의 시작으로 보는 태그
-BLOCK_TAGS = {"box", "row", "grid", "grid-item", "divider", "WritingBlock"}
-KNOWN = BLOCK_TAGS | {"icon", "caption", "text", "badge", "Link"}
+BLOCK_TAGS = {"box", "row", "grid", "grid-item", "divider", "WritingBlock", "AsyncImage", "AsyncImageGroup", "Chart"}
+# 글자로 바뀌는 인라인 위젯 — 앞뒤 글자와 한 Markdown 조각으로 이어 렌더해야 한다
+# (따로 렌더하면 **<Entity/>**가 "**"만 남고, 뒤에 들여쓴 문단이 dedent되지 않아 코드 블록이 된다)
+INLINE_TEXT = {"Entity", "Cite"}
+KNOWN = BLOCK_TAGS | INLINE_TEXT | {"icon", "caption", "text", "badge", "Link"}
 # 레이아웃 블록 안에서 만나도 태그가 아니라 글자(Markdown·HTML)로 넘기는 일반 HTML 태그
 # (닫는 태그가 없는 void 요소 img·br·hr·wbr 포함 — 레이아웃 요소로 보면 짝이 안 맞아 블록 전체가 원문 표시로 떨어진다)
 HTML_PASSTHROUGH = {"a", "b", "br", "code", "em", "i", "kbd", "s", "small", "span", "strong", "sub", "sup", "del",
@@ -288,6 +295,8 @@ class Renderer:
         for ch in node.children:
             if ch.kind == "text":
                 buf.append(_interp(ch.text, scope))
+            elif ch.kind == "el" and ch.name in INLINE_TEXT:
+                buf.append(_inline_text(ch.name, {k: _attr(ch, k, scope) for k in ch.attrs}))
             else:
                 flush()
                 out.append(self.node(ch, scope))
@@ -329,6 +338,28 @@ class Renderer:
         if fl is not None and NUM.fullmatch(str(fl)):
             cls.append(f"lt-flex-{fl}")
         return cls, style
+
+    def chart(self, spec):
+        """<Chart content={…}/> → 원문 데이터 표. 형식이 다르면 모르는 태그처럼 경고만 남긴다."""
+        try:
+            x, series, rows = spec["xKey"], spec["series"], spec["data"]
+            heads = [html.escape(str(spec.get("meta", {}).get("xLabel") or x))]
+            cols = []
+            for s in series:
+                suffix = str(s.get("valueSuffix") or "")
+                heads.append(html.escape(str(s.get("label") or s["dataKey"])) + (f" ({html.escape(suffix)})" if suffix else ""))
+                cols.append(s["dataKey"])
+            body = "".join(
+                "<tr><th>" + html.escape(str(r.get(x, ""))) + "</th>"
+                + "".join(f"<td>{html.escape(str(r.get(c, '')))}</td>" for c in cols) + "</tr>"
+                for r in rows)
+        except (TypeError, KeyError, AttributeError):
+            self.warnings.append("<Chart> 데이터 형식을 읽지 못함 — 표시 안 함")
+            return '<div class="lt-unknown"></div>'
+        foot = (spec.get("meta") or {}).get("footer")
+        cap = f"<figcaption>{html.escape(str(foot))}</figcaption>" if foot else ""
+        return ('<figure class="lt-chart"><table><thead><tr>' + "".join(f"<th>{h}</th>" for h in heads)
+                + f"</tr></thead><tbody>{body}</tbody></table>{cap}</figure>")
 
     def wrap(self, tag, cls, style, inner):
         s = f' style="{html.escape(";".join(style))}"' if style else ""
@@ -373,6 +404,12 @@ class Renderer:
             return '<hr class="lt-divider">'
         if name == "WritingBlock":
             return f'<div class="lt-writing">{self.children(node, scope)}</div>'
+        if name in INLINE_TEXT:
+            return self.inline_md(_inline_text(name, {k: _attr(node, k, scope) for k in node.attrs}))
+        if name in ("AsyncImage", "AsyncImageGroup"):
+            return ""
+        if name == "Chart":
+            return self.chart(_attr(node, "content", scope))
         if name == "Link":
             url, title = _attr(node, "url", scope), _attr(node, "title", scope)
             label = html.escape(str(title or url or ""))
@@ -389,8 +426,17 @@ FENCE = re.compile(r"^(?:\s*(?:[-*+]|\d+[.)])\s+|\s*>\s?)*\s*(`{3,}|~{3,})")
 CODE_SPAN = re.compile(r"(`+)(?!`).*?(?<!`)\1(?!`)")
 START = re.compile(r"^ {0,3}<(" + "|".join(sorted(BLOCK_TAGS, key=len, reverse=True)) + r")[\s/>]")
 LINK_INLINE = re.compile(r"<Link\s([^<>]*?)/?>")
+WIDGET_INLINE = re.compile(r"<(Entity|Cite)\s[^<>]*?/>")
 
 
+
+
+def _inline_text(name, attrs):
+    """INLINE_TEXT 위젯을 Markdown 글자로. Entity는 value(Markdown 백슬래시 이스케이프 — HTML 이스케이프를 겹치면 &lt;가 글자로 보임), Cite는 빈 글자."""
+    if name == "Entity":
+        v = attrs.get("value")
+        return re.sub(r"([\\`*_\[\]#|~<>&])", r"\\\1", v) if isinstance(v, str) else ""
+    return ""
 
 
 def _open(text):
@@ -420,13 +466,27 @@ def _link_to_md(m):
     return title
 
 
+def _widget_to_md(m):
+    try:
+        tag = _parse_tag(m.group(0), 0)
+    except LayoutError:
+        return m.group(0)
+    if not tag:
+        return m.group(0)
+    return _inline_text(tag[0], {k: v for k, (_, v) in tag[1].items()})
+
+
+def _inline_outside(text):
+    return WIDGET_INLINE.sub(_widget_to_md, LINK_INLINE.sub(_link_to_md, text))
+
+
 def _links_outside_code(line):
-    """인라인 코드(`…`) 밖의 <Link …/>만 Markdown 링크로 바꾼다."""
+    """인라인 코드(`…`) 밖의 <Link …/>는 Markdown 링크로, <Entity …/>·<Cite …/>는 글자로 바꾼다."""
     out, last = [], 0
     for m in CODE_SPAN.finditer(line):
-        out += [LINK_INLINE.sub(_link_to_md, line[last:m.start()]), m.group(0)]
+        out += [_inline_outside(line[last:m.start()]), m.group(0)]
         last = m.end()
-    out.append(LINK_INLINE.sub(_link_to_md, line[last:]))
+    out.append(_inline_outside(line[last:]))
     return "".join(out)
 
 

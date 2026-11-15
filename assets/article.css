@@ -90,6 +90,9 @@ a{color:#cbd5df}
 .lt-writing{border:1px solid #414750;border-radius:10px;padding:10px 14px;background:#161a20}
 .lt-writing::before{content:"Writing";display:block;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--art-muted);margin-bottom:4px}
 .lt-unknown{border:1px dashed #5b6470;border-radius:8px;padding:6px 10px}
+.lt-chart{margin:0}
+.lt-chart table{margin:6px 0}
+.lt-chart figcaption{font-size:12px;color:var(--art-muted)}
 .lt-fallback__note{font-size:12px;color:#ecc77a;margin:4px 0}
 /* reader.css의 overflow-wrap:anywhere가 좁은 상자에서 "Development"를 글자 단위로 끊지 않게: 단어 단위로 줄바꿈하고 폭 지정 상자는 가장 긴 단어만큼은 넓어진다 */
 .lt-root{overflow-wrap:break-word}.lt-box[style*="width:"]{min-width:min-content}
