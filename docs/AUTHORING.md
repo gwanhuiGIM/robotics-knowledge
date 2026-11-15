@@ -26,7 +26,7 @@
 ```yaml
 ---
 title: "ROS 2 QoS의 Reliability와 Durability 차이"   # 필수
-category: Systems                  # 필수 — tools/site.yml categories 중 하나
+category: ROS 2                    # 필수 — tools/site.yml categories 중 하나(ROS 2·Linux·Manufacturing·DevOps·Control·Simulation·Embodied AI). Systems는 2026-11-14에 나뉘어 쓰지 않는다
 content_mode: new_answer           # 필수 — tools/site.yml content_modes 중 하나 (아래 4절)
 published: 2026-11-07              # 필수 — YYYY-MM-DD
 updated: 2026-11-08                # 선택
@@ -69,6 +69,7 @@ source_note: "출처: …"             # 선택 — 글 맨 아래 출처 문구
 ```
 
 - 질의가 여러 번이면 `> [!PROMPT]`와 답변을 순서대로 반복한다.
+- `> [!PROMPT]` 안의 글자는 홈 목록에 그 글의 질문으로 그대로 표시된다(첫 질문은 보이고 나머지는 펼침). 질문이 없으면 홈에 "질문 원문 미확보"로 나온다.
 - 원문을 손질했다면 무엇을 바꿨는지 `> [!NOTE]`에 적는다.
 
 ## 6. 지원 문법

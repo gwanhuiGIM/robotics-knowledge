@@ -16,7 +16,7 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 3. Do not silently remove/add claims, invent citations, manipulate original measurements, reconstruct missing sentences as source text, or conflate a recreated visualization with a source image.
 4. Keep original source material separately when feasible. Rendering fixes (semantic headings, tables, LaTeX, code highlighting) may change markup **without changing informational meaning**. If exact restoration is impossible, disclose it.
 5. Treat all GitHub Pages content as **public**. Check for personal information, secrets, proprietary material, credentials, private attachments, and third-party reuse rights before committing.
-6. Preserve the working dark design and features: **category sidebar, keyword search, article links, sticky TOC, back/list/top controls, reading progress, mobile responsive layout**.
+6. Preserve the working dark design and features: **category filter (homepage category chips — the left sidebar was replaced by the user's decision on 2026-11-14), keyword search, article links, sticky TOC, back/list/top controls, reading progress, mobile responsive layout**.
 7. Check duplicates before adding an article (title, Notion page URL/ID, topic and source). Do not create multiple cards for the same article; update only if requested or materially necessary.
 8. Do not overwrite unrelated user files, delete existing articles, or reword prior Q&A as a side effect of layout improvements.
 9. Distinguish **commit success**, **GitHub Actions deployment success**, and **real rendered/browser behavior**. Do not report unperformed tests as passed.
@@ -26,7 +26,7 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 
 - **New articles are Markdown**: write `content/<slug>.md` (front matter + Markdown) following [docs/AUTHORING.md](docs/AUTHORING.md). Allowed values live only in `tools/site.yml`. Do **not** create `articles/*.html` or edit the homepage by hand for new articles.
 - `tools/build.py`: builds `_site/` on deploy — renders `content/*.md` to `articles/<slug>.html`, generates the homepage from `tools/templates/index.html`, copies legacy files, excludes `docs/`, `AGENTS.md`, `*.txt`, `content/`, `tools/`. `tools/layout_tags.py` renders ChatGPT layout tags (`<box>`, `<row>`, `<grid>`, `{#each}`) kept verbatim in `content/*.md`.
-- `tools/legacy_cards.yml`: verbatim homepage cards of the legacy HTML articles.
+- `tools/legacy_cards.yml`: homepage list items of the legacy HTML articles as structured fields (title/summary/tags/search copied verbatim from the old cards; `questions` copied verbatim from each article). The homepage shows each item's question(s); `content/*.md` questions come from `> [!PROMPT]` blocks.
 - `articles/*.html`: legacy static articles (individual markup/styles); keep unless migrating one to `content/` in the same change.
 - `assets/reader.css`, `assets/reader.js`: shared article reading UI. `assets/article.css`, `assets/article.js`: Markdown article styles and KaTeX/Mermaid/lucide-icon rendering (pinned CDN versions with SRI in `tools/build.py`).
 - `tests/check.py`: renderer and site self-check (`python tests/check.py --site _site`).

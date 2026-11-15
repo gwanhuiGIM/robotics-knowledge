@@ -1,6 +1,6 @@
 ---
 title: "Dev, Ops, CI/CD와 GitHub 프로젝트 공개 역량"
-category: Systems
+category: DevOps
 card_label: "질문·답변 원문 보존"
 content_mode: original_qa
 published: 2026-10-29

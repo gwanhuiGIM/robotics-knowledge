@@ -1,11 +1,18 @@
 # 사이트 허용 값의 단일 출처. tools/build.py와 docs/AUTHORING.md가 이 파일을 기준으로 한다.
-# 값을 추가·변경하면 홈 사이드바(tools/templates/index.html의 data-filter 버튼)도 함께 맞춘다.
+# 홈의 분야 칩·섹션은 빌드가 이 목록 순서대로 만든다(글이 0개인 분야는 홈에 나오지 않음).
 
-categories:            # front matter `category` 허용 값 → 카드 상단 라벨
-  Simulation: SIMULATION
-  Control: ROBOT CONTROL
-  Embodied AI: EMBODIED AI
-  Systems: SYSTEMS
+categories:            # front matter `category` 허용 값 → 화면 라벨 (2026-11-14 Systems를 넷으로 나눔)
+  ROS 2: ROS 2 · 분산 시스템
+  Linux: Linux · 실시간
+  Manufacturing: 제조 · 산업 시스템
+  DevOps: 개발 프로세스
+  Control: Robot Control
+  Simulation: Simulation
+  Embodied AI: Embodied AI
+
+# 옛 값 → 안내. 이 값으로 쓴 글은 배포에서 빠지고 경고에 새 값 후보가 나온다.
+retired_categories:
+  Systems: "2026-11-14에 나뉨 — ROS 2 / Linux / Manufacturing / DevOps 중 하나로"
 
 content_modes:         # front matter `content_mode` 허용 값 → 화면 라벨
   original_qa: 원문 Q&A          # 사용자 질문 + 실제로 확보한 ChatGPT 답변 원문
@@ -13,3 +20,6 @@ content_modes:         # front matter `content_mode` 허용 값 → 화면 라�
   reconstructed: 재구성 답변       # 과거 답변 원문을 확보하지 못해 다시 구성한 답변
 
 required_fields: [title, category, content_mode, published, summary]
+
+# 홈 맨 위 소개글(공개 문구)
+intro: "채용공고(JD)와 산업 현장에서 마주친 로보틱스 용어를 ChatGPT에 직접 묻고, 그 질문과 답변을 정리해 둔 학습 기록입니다. 분야별로 어떤 용어에 대해 무엇을 물었는지 먼저 보이고, 제목을 누르면 답변 전문으로 이동합니다."

@@ -1,6 +1,6 @@
 ---
 title: "레이아웃 태그 시험"
-category: Systems
+category: ROS 2
 content_mode: new_answer
 published: 2026-11-08
 summary: "ChatGPT 레이아웃 태그 렌더러 회귀 시험용 샘플"
