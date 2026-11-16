@@ -15,6 +15,8 @@ source_note: "이 글은 2026-11-16 동일 대화의 GPT 답변에 기반합니�
 
 > [!NOTE]
 > 답변 원문에 있던 설명·표·수식과 학습 순서를 유지한 게시본입니다. ChatGPT 전용 동적 격자 그림, SVG, 이미지 검색 위젯은 같은 파일로 옮길 수 없어 일부 시각자료를 Mermaid 흐름도와 텍스트로 재구성했습니다. 원문 시각자료와 동일한 그림이라는 의미는 아닙니다. 원문의 일회성 출처 토큰은 제거하고 공식 문서 링크를 맨 아래에 별도로 기재했습니다.
+>
+> **2026-11-16 보완:** 답변 공유본과 대조해 게시 때 빠진 문장 2개, Nav2 구성도의 단계 설명, "(우선)" 표기, 인라인 코드 표기 6곳, MPC 개념도 SVG, 답변 끝의 확신도·가정 줄을 되살렸습니다. SVG는 어두운 배경에서 보이도록 글자·보조선 색만 바꿨고, 범례의 선 모양 설명은 그림을 보고 덧붙인 것입니다. 격자 탐색 비교 그림 3개, 경로 비교 그림, 로봇 사진은 공유본에 원본 파일이 없어 여전히 빠져 있습니다.
 
 # 로보틱스 경로 탐색·경로 계획 알고리즘 총정리
 
@@ -63,6 +65,10 @@ $$
 
 > [!WARNING]
 > **원문 시각자료 대체 설명:** 원문에서는 같은 격자에 장애물을 배치하고 Dijkstra·Greedy·A*의 탐색 경향을 보여주는 개념도 3개를 표시했습니다. 실제 알고리즘 실행으로 측정한 결과가 아닌 개념도였으며, 본 게시본에는 그림 대신 아래 설명과 비교표를 제공합니다.
+
+### 동일 지도에서의 탐색 방식 비교
+
+위 격자들은 탐색 성향을 설명하기 위한 개념도이며, 동일 조건에서 실제 알고리즘을 실행해 얻은 탐색 노드 수나 경로 결과는 아닙니다.
 
 ### ① Dijkstra — 비용이 낮은 곳부터 확장
 
@@ -205,6 +211,8 @@ Hybrid A*는 경로의 *주행 가능성*을, D* Lite는 환경이 바뀌었을 
 > [!WARNING]
 > **원문 시각자료 대체 설명:** 원문에는 RRT, RRT*, PRM의 나무/경로망을 보여주는 외부 이미지 검색 위젯이 있었습니다. 실제 이미지 파일이 제공되지 않아 게시본에는 이미지를 재게시하지 않습니다.
 
+RRT 계열은 샘플을 뽑아 탐색 트리를 확장하며, PRM은 충돌 없는 샘플들을 연결해 경로망을 구축합니다.
+
 ### ① RRT (Rapidly-exploring Random Tree)
 
 공간에 무작위 점을 생성하고, 기존 트리에서 그 점과 가까운 노드를 선택해 가지를 뻗어나가는 방식입니다.
@@ -257,6 +265,12 @@ RRT*는 새로운 노드가 만들어질 때 주변 노드와의 연결을 비�
 반면 실제 로봇은 장애물 회피뿐 아니라 속도, 가속도, 조향각, 가속도 변화율(Jerk)까지 고려해야 합니다.
 
 ### ① MPC (Model Predictive Control)
+
+![MPC/샘플링 제어의 개념도: 현재 위치에서 예측 지평선까지 후보 궤적 3개 중 하나를 선택](../assets/img/robotics-path-planning-algorithms/mpc-candidates.svg)
+
+범례: 선택된 후보(굵은 초록 실선) · 다른 후보(파랑·주황 점선)
+
+MPC/샘플링 제어의 개념도. 실제 MPC의 후보 생성 방식은 최적화 방법에 따라 달라집니다.
 
 MPC는 미래의 일정 시간 구간에서 로봇의 상태 변화를 예측하고, 비용함수를 최소화하는 제어 입력을 계산합니다.
 
@@ -357,6 +371,26 @@ flowchart TD
  C -. "MPPI · DWB · MPC · Pure Pursuit" .-> C
 ~~~
 
+**SLAM / Localization / Costmap**
+
+현재 위치와 장애물 지도 생성
+
+**Global Planner**
+
+Dijkstra · A* · Theta* · Hybrid A* · Lattice
+
+출발점에서 목적지까지의 전역 경로
+
+**Local Controller / Trajectory Optimization**
+
+MPPI · DWB · MPC · Pure Pursuit
+
+실시간 장애물·로봇 상태를 반영한 제어
+
+**Robot Hardware**
+
+속도·조향·관절 명령 실행
+
 ROS 2 Nav2를 단순화한 구성도. 실제로는 BT Navigator, Planner Server, Controller Server, Costmap, Collision Monitor 등이 함께 동작합니다.
 
 Nav2의 실제 플러그인 분류를 보면 다음과 같습니다.
@@ -379,19 +413,19 @@ Nav2의 실제 플러그인 분류를 보면 다음과 같습니다.
 
 ### TurtleBot4 · 실내 AMR
 
-추천 시작점: **Smac 2D 또는 NavFn + Regulated Pure Pursuit**
+추천 시작점: `Smac 2D` 또는 `NavFn` + `Regulated Pure Pursuit`
 
 격자 기반 경로 탐색을 이해하기 좋고, Nav2 플러그인별 탐색 결과와 추종 성능을 비교하기 쉽습니다. 장애물이 많은 환경에서는 MPPI도 비교해 볼 만합니다.
 
 ### ERP42 · Ackermann 자율주행 차량
 
-추천 시작점: **Hybrid A* + Pure Pursuit / Stanley**
+추천 시작점: `Hybrid A*` + `Pure Pursuit / Stanley`
 
 기존 waypoint 추종 구조에 장애물 회피 기능을 확장한다면 Hybrid A*가 유용합니다. 더 높은 수준의 동역학 제어가 필요해지면 MPC를 검토할 수 있습니다.
 
 ### Doosan M0609 · 협동로봇
 
-추천 시작점: **RRT-Connect + MoveIt 2**
+추천 시작점: `RRT-Connect` + MoveIt 2
 
 6축 관절 공간에서 충돌 없는 경로를 찾고, 이후 시간 파라미터화·궤적 검증을 수행합니다. CHOMP나 RRT*는 경로 품질 비교용으로 확장하기 좋습니다.
 
@@ -399,7 +433,7 @@ Nav2의 실제 플러그인 분류를 보면 다음과 같습니다.
 
 현재 ROS 2와 모바일 로봇, 협동로봇을 함께 다루는 관점이라면 모든 알고리즘을 개별적으로 구현할 필요는 없습니다.
 
-### 1단계 — 그래프 탐색 원리 이해
+### 1단계 — 그래프 탐색 원리 이해 (우선)
 
 Python으로 Dijkstra, Greedy, A*를 같은 Occupancy Grid에서 구현하고 탐색 노드 수, 경로 길이, 계산 시간을 비교합니다.
 
@@ -439,6 +473,14 @@ MoveIt 2에서 RRT-Connect, RRT*, CHOMP를 비교해 계획 시간, 충돌 검�
 
 - [Nav2 Navigation Plugins](https://docs.nav2.org/rolling/configuration_and_development/navigation_plugins/)
 - [OMPL Available Planners](https://ompl.kavrakilab.org/planners.html)
+
+---
+
+확신도: 검증됨(같은 턴 도구 출력으로 확인) — Nav2·OMPL의 지원 알고리즘과 기본 특성. 추론(근거 있으나 미확인) — 사용자 프로젝트별 알고리즘 추천 및 학습 우선순위.
+
+내가 채워넣은 가정: ① 전역 경로 탐색과 국소 궤적 계획을 모두 포함 ② ROS 2 모바일 로봇과 협동로봇을 주요 적용 대상으로 설정
+
+확인 요청: 없음
 
 ---
 
