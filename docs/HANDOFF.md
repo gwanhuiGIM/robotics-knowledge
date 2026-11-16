@@ -37,12 +37,12 @@ This is a curated paraphrased history, not a full original transcript. Never pre
 - AGENTS.md: invariant agent rules; docs/OPERATIONS.md: operational procedure; docs/HANDOFF.md: current decisions/status
 
 ### Scheduled ingestion
-Retired. A scheduled task (Robotics Knowledge Lab 게시 자동화) used to read Notion entries titled '사이트 게시 | 질문' and attempt publication. By the user's own record it was paused on 2026-11-08 (current task settings not re-checked), and the user decided on 2026-11-14 not to resume it (entry 15). Do not treat Notion entries as publish requests. See docs/OPERATIONS.md section 3.
+Retired. A scheduled task (Robotics Knowledge Lab 게시 자동화) used to read Notion entries titled '사이트 게시 | 질문' and attempt publication. The user paused it on 2026-11-08 and confirmed on 2026-11-16 that it is still off; the user decided on 2026-11-14 not to resume it (entry 15). Do not treat Notion entries as publish requests. See docs/OPERATIONS.md section 3.
 
 ### Verification and future collaboration
 - Confirm local git clone, branch and dirty state on the user's machine separately. Remote GitHub inspection cannot verify these.
 - Check category/search empty results, TOC anchors, back/top buttons, mobile widths 360/390/760px, source accuracy, external references, GitHub deployment and actual rendered page.
 - Implemented on 2026-11-07 (entry 13): Markdown source files in `content/`, front-matter metadata, shared article/home templates, a build self-check (`tests/check.py`). Still future work: migrating the remaining legacy HTML articles one by one, browser-level regression tests in CI.
-- Local and web agents should operate on separate branches/PRs where practical, refresh current state before writing to shared files, and record verified work plus uncertainties. Never rewrite user Q&A merely to polish layout.
+- Site code changes (build, templates, CSS/JS, tests) go through a separate branch/PR; documentation-only changes and connector article commits go directly to `main` (user decision 2026-11-16). Refresh current state before writing to shared files, and record verified work plus uncertainties. Never rewrite user Q&A merely to polish layout.
 
 Updated: 2026-11-16 (entry 15 and the Scheduled ingestion paragraph; documentation only). Earlier note, 2026-11-07: Entry 13 records the Markdown pipeline decision; local build, self-check and headless-Chrome checks passed on the feature branch, but GitHub Actions deployment and the scheduled job were not tested.
