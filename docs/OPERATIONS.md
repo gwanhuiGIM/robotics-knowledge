@@ -62,7 +62,7 @@ Notion 항목 제목(`사이트 게시 | <질문 또는 주제>`)을 예약 작�
 
 - `content/*.md`: 새 글 원본(front matter + Markdown). 작성 규약은 [AUTHORING.md](AUTHORING.md), 허용 값은 `tools/site.yml`
 - `tools/build.py`: 배포 시 `_site/` 생성 — 새 글 HTML·홈 카드 생성, 기존 파일 복사, 내부 문서 제외. `tools/layout_tags.py`: ChatGPT 레이아웃 태그(`<box>`·`<row>`·`{#each}` 등) 렌더
-- `tools/templates/index.html`: 홈 템플릿(소개글, 분야 칩, 검색, 분야별 목록). 소개글·칩·목록은 빌드가 채운다(소개글 문구는 `tools/site.yml` `intro`)
+- `tools/templates/index.html`: 홈 템플릿(왼쪽 세로 분야 목록·소개글, 검색, 한 줄씩 나열하는 최신순 목록 — 2026-11-17). 소개글·분야 목록·글 목록은 빌드가 채운다(소개글 문구는 `tools/site.yml` `intro`)
 - `tools/legacy_cards.yml`: 기존 HTML 글의 홈 목록 항목(제목·요약·태그·검색어는 옛 카드 그대로, 질문은 각 글에서 그대로 옮김)
 - `articles/*.html`: 기존 HTML 문서 (각자 스타일을 포함할 수 있음)
 - `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI / `assets/article.css`, `assets/article.js`: Markdown 글 스타일과 수식·Mermaid·레이아웃 아이콘(lucide) 렌더
@@ -96,7 +96,7 @@ Notion 항목 제목(`사이트 게시 | <질문 또는 주제>`)을 예약 작�
 - **C01 / 미확정:** 좁은 화면에서 table min-width 때문에 전체 가로 스크롤 가능. 표 래퍼 및 360px·390px 테스트.
 
 배포 전 최소 테스트:
-- 분야 칩(`tools/site.yml` categories 중 글이 있는 것)과 `전체`에서 항목 수·숨김 동작, 빈 분야 섹션 숨김
+- 왼쪽 분야 목록(`tools/site.yml` categories 중 글이 있는 것)과 `전체`에서 항목 수·숨김 동작, 글 0개 분야는 목록에 없음
 - 존재하지 않는 검색어와 실제 키워드
 - 각 글의 목차 앵커 존재, 클릭 후 정상 스크롤, active 항목
 - 1366 px 이상 데스크톱 폭에서 콘텐츠 넘침, 목차/뒤로/맨 위로(모바일 폭은 검증하지 않음 — 사용자 결정 2026-11-16)
