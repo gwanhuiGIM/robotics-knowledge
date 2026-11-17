@@ -62,7 +62,7 @@ Notion 항목 제목(`사이트 게시 | <질문 또는 주제>`)을 예약 작�
 
 - `content/*.md`: 새 글 원본(front matter + Markdown). 작성 규약은 [AUTHORING.md](AUTHORING.md), 허용 값은 `tools/site.yml`
 - `tools/build.py`: 배포 시 `_site/` 생성 — 새 글 HTML·홈 카드 생성, 기존 파일 복사, 내부 문서 제외. `tools/layout_tags.py`: ChatGPT 레이아웃 태그(`<box>`·`<row>`·`{#each}` 등) 렌더
-- `tools/templates/index.html`: 홈 템플릿(왼쪽 세로 분야 목록·소개글, 검색, 한 줄씩 나열하는 최신순 목록 — 2026-11-17). 소개글·분야 목록·글 목록은 빌드가 채운다(소개글 문구는 `tools/site.yml` `intro`)
+- `tools/templates/index.html`: 홈 템플릿(맨 위 소개, 그 아래 왼쪽 세로 분야 목록·검색·한 줄씩 나열하는 최신순 목록 — 2026-11-17). 소개글·분야 목록·글 목록은 빌드가 채운다(소개글 문구는 `tools/site.yml` `intro`)
 - `tools/legacy_cards.yml`: 기존 HTML 글의 홈 목록 항목(제목·요약·태그·검색어는 옛 카드 그대로, 질문은 각 글에서 그대로 옮김)
 - `articles/*.html`: 기존 HTML 문서 (각자 스타일을 포함할 수 있음)
 - `assets/reader.css`, `assets/reader.js`: 전체 문서에 적용하는 공통 리더 UI / `assets/article.css`, `assets/article.js`: Markdown 글 스타일과 수식·Mermaid·레이아웃 아이콘(lucide) 렌더
