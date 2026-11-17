@@ -42,8 +42,8 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 - [ ] Existing article checked; safe filename and category/keywords chosen
 - [ ] New article written as `content/<slug>.md` per docs/AUTHORING.md (front matter valid, `content_mode` accurate); homepage lists it once
 - [ ] Search and categories actually hide nonmatching cards
-- [ ] Heading IDs/TOC anchors valid; long tables scroll within mobile viewport
-- [ ] Accessibility, keyboard interaction and narrow screen checked where tooling permits
+- [ ] Heading IDs/TOC anchors valid; long tables scroll within the article column
+- [ ] Accessibility and keyboard interaction checked where tooling permits (mobile/narrow screens are not checked — rule 6)
 - [ ] Commit SHA obtained; deployment/browser status verified separately
 
 ## Handoff
