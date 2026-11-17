@@ -162,13 +162,16 @@ def site_check(out):
     total = re.search(r'data-filter="all">[^<]*<b>(\d+)</b>', index)
     check(total is not None and int(total.group(1)) == len(items), "전체 칩 숫자 불일치")
 
+    # GitHub에서 HTML을 지운 옛 글은 빌드가 홈에서 뺀다 — 검사도 HTML이 남은 항목만 센다.
+    live_legacy = [c for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
+                   if (ROOT / "articles" / f"{c['slug']}.html").exists()]
     # 질문이 그 글의 항목 안, 화면의 질문 상자에 순서대로 그대로 있는지(data-q에만 있거나 다른 글로 옮겨지면 실패)
     def shown_in(slug):
         for a in re.findall(r'<article class="item".*?</article>', index, re.S):
             if f'href="articles/{slug}.html"' in a:
                 return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p>', a, re.S)], a
         return None, ""
-    for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]:
+    for c in live_legacy:
         want = [q if isinstance(q, str) else q["text"] for q in c.get("questions") or []]
         got, a = shown_in(c["slug"])
         check(got == want, f"홈 질문 불일치: {c['slug']}")
@@ -183,7 +186,7 @@ def site_check(out):
         md.render(build.split_front_matter(p.read_text(encoding="utf-8"), p)[1], env)
         got, _ = shown_in(p.stem)
         check(got == (env.get("prompts") or []), f"홈 질문 불일치(content): {p.stem}")
-    legacy = len(build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"])
+    legacy = len(live_legacy)
     content = len(list((ROOT / "content").glob("*.md")))
     check(len(hrefs) == legacy + content, f"카드 수 {len(hrefs)} != 기존 {legacy} + 생성 {content}")
     check(len(hrefs) == len(set(hrefs)), "중복 카드")

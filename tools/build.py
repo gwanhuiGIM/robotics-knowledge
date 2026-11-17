@@ -263,13 +263,14 @@ def render_article(path, md, site, tpl):
     )
     qs = env.get("prompts") or []
     item = make_item(slug, dict(meta, questions=qs, date=meta["published"],
-                                mode=site["content_modes"][meta["content_mode"]]), site)
+                                mode=site["content_modes"][meta["content_mode"]]), site, f"content/{slug}.md")
     return slug, page, (meta["category"], bool(qs), item), meta["published"]
 
 
-def make_item(slug, it, site):
+def make_item(slug, it, site, src):
     """홈 목록 한 항목. legacy(tools/legacy_cards.yml)와 content 글이 같은 함수로 그려진다.
 
+    src: 저장소 안 원본 경로(관리 모드 삭제 버튼이 GitHub 삭제 화면으로 연결할 때 쓴다).
     it: title, summary, category, tags, questions, 선택 label·card_label·mode·content_mode·keywords·jd·search
     <a> 안에 <details>를 둘 수 없어(인터랙티브 중첩) 링크는 제목에만 둔다.
     """
@@ -297,7 +298,7 @@ def make_item(slug, it, site):
     else:
         q = '<p class="q q-none">질문 원문 미확보</p>'
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in it.get("tags") or [])
-    return (f'<article class="item" data-category="{esc(it["category"])}" data-search="{esc(search)}" '
+    return (f'<article class="item" data-category="{esc(it["category"])}" data-src="{esc(src)}" data-search="{esc(search)}" '
             f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">{head}{q}'
             f'<p class="sum">{esc(it["summary"])}</p>'
             f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
@@ -324,8 +325,7 @@ def render_home(items, site):
 
 def copy_static(out):
     for item in ROOT.iterdir():
-        # '_'로 시작하는 폴더는 빌드 출력·로컬 휴지통(_site, _preview, _trash)이라 배포하지 않는다.
-        if item.name in EXCLUDE_TOP or item.name.startswith((".", "_")):
+        if item.name in EXCLUDE_TOP or item.name == out.name or item.name.startswith("."):
             continue
         if item.is_file() and item.suffix in EXCLUDE_SUFFIX:
             continue
@@ -350,9 +350,13 @@ def build(out):
     cards = []  # (date, order, category, has_question, html)
     legacy = yaml.safe_load((TOOLS / "legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
     for i, c in enumerate(legacy):
+        if not (ROOT / "articles" / f"{c['slug']}.html").exists():
+            # GitHub에서 HTML만 지운 옛 글 — 빈 링크 카드를 만들지 않는다(yml 항목은 나중에 정리해도 됨).
+            warn(Path("tools/legacy_cards.yml"), f"{c['slug']}: articles/{c['slug']}.html이 없어 홈에서 뺌(삭제된 글)")
+            continue
         if c["category"] not in site["categories"]:
             raise SystemExit(f"tools/legacy_cards.yml {c['slug']}: category 허용 값 아님 {c['category']!r}")
-        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site)))
+        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site, f"articles/{c['slug']}.html")))
 
     built, failed = [], []
     for path in sorted((ROOT / "content").glob("*.md")):

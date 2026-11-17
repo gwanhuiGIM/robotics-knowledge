@@ -131,17 +131,13 @@ python3 -m http.server 8799 --directory _site   # 브라우저로 http://127.0.0
 - connector 게시도 배포 workflow에서 같은 빌드·검사가 돈다. 글 하나가 규약을 어기면 그 글만 배포에서 빠지고 Actions에 `::warning`이 남는다 — **커밋 성공 ≠ 게시 성공**이므로 Actions 결과와 실제 페이지를 따로 확인한다(AGENTS.md 규칙 9).
 - 중복 확인: 같은 주제·같은 질문의 글이 `content/`나 `tools/legacy_cards.yml`에 이미 있는지 먼저 본다.
 
-### 글 삭제 (로컬 전용, 사용자만)
+### 글 삭제 (사용자만)
 
-```bash
-git pull --ff-only   # 먼저 connector가 올린 최신 글을 받는다
-uv run --no-project --with-requirements tools/requirements.txt python tools/preview.py   # http://127.0.0.1:8000/
-```
-
-- 이 주소에서만 홈 카드와 글 화면에 **삭제** 버튼이 보인다. 공개 사이트와 `_site` 빌드에는 버튼이 없다. 서버는 이 PC(127.0.0.1)에서만 열리고, 실행마다 바뀌는 토큰이 없는 요청은 거부한다.
-- 삭제 버튼 → 지울 파일 목록 확인 창 → 삭제. 파일은 지우지 않고 `_trash/<시각>-<slug>/`로 옮긴다(gitignore). 대상: `content/<slug>.md` 또는 `articles/<slug>.html` + `tools/legacy_cards.yml`의 그 항목, `assets/img/<slug>/`.
-- 삭제 직후 홈 알림에서 **되돌리기**, 또는 `python tools/preview.py --restore <id>`로 복구한다. 알림의 **커밋 명령 복사**로 그 글 파일만 커밋한 뒤 push하면 공개 사이트에서 사라진다. 서버는 git 조작(add·commit·push)을 하지 않는다.
-- AI 에이전트는 이 기능을 쓰지 않는다(AGENTS.md 규칙 8).
+- 사이트 주소 끝에 `?admin`을 붙여 한 번 열면 그 브라우저에서 관리 모드가 켜진다(`?admin=off` 또는 왼쪽 아래 "끄기"로 끔). 홈 카드와 글 화면에 **삭제** 버튼이 보인다.
+- 삭제 → 확인 → GitHub의 그 파일 삭제 화면이 새 탭으로 열림 → **Commit changes** → Actions 재배포 뒤 사이트에서 사라진다. 로컬은 `git pull`로 맞춘다.
+- 버튼은 숨김 편의일 뿐 권한이 아니다. 실제 삭제는 GitHub 저장소 쓰기 권한이 있어야 된다.
+- 지워지는 것은 원본 파일 하나다(`content/<slug>.md` 또는 `articles/<slug>.html`). 옛 글의 `tools/legacy_cards.yml` 항목은 남아도 빌드가 홈에서 빼고 `::warning`만 남긴다. `assets/img/<slug>/` 그림도 남는다 — 필요하면 나중에 정리한다. 되돌리기는 GitHub 커밋 기록에서 한다.
+- AI 에이전트는 이 버튼으로 글을 지우지 않는다(AGENTS.md 규칙 8).
 
 ## 8. ChatGPT 프로젝트 지시문에 넣을 포인터
 

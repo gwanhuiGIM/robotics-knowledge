@@ -24,3 +24,5 @@ addEventListener("scroll",update,{passive:true});addEventListener("resize",updat
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup()
 })();
+// 관리 모드 삭제 버튼(assets/admin.js) — ?admin 으로 켠 브라우저에서만 보인다.
+(function(){var c=document.currentScript;if(!c)return;var s=document.createElement("script");s.defer=true;s.src=new URL("admin.js",c.src).href;document.head.appendChild(s)})();
