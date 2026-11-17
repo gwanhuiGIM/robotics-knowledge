@@ -11,11 +11,11 @@
   } catch { return; }
 
   const css = document.createElement("style");
-  css.textContent = `.rk-badge{position:fixed;left:16px;bottom:16px;z-index:200;display:flex;gap:8px;align-items:center;background:#2a1d1f;border:1px solid #6b3a40;color:#f0c9cd;border-radius:10px;padding:8px 12px;font:13px/1.4 system-ui,"Noto Sans KR",sans-serif;box-shadow:0 4px 20px #0006}
+  css.textContent = `.rk-badge{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:200;display:flex;gap:8px;align-items:center;background:#2a1d1f;border:1px solid #6b3a40;color:#f0c9cd;border-radius:10px;padding:8px 12px;font:13px/1.4 system-ui,"Noto Sans KR",sans-serif;box-shadow:0 4px 20px #0006}
 .rk-del{border:1px solid #8a3d45;background:#3a2226;color:#ffd5d9!important;border-radius:8px;padding:4px 10px;font:13px/1.4 system-ui,"Noto Sans KR",sans-serif;cursor:pointer;text-decoration:none!important;white-space:nowrap}
 .rk-del:hover,.rk-del:focus-visible{background:#5a2a30}
 .rk-off{background:none;border:0;color:#c79aa0;font:inherit;cursor:pointer;text-decoration:underline}
-.item{position:relative}.item>.rk-del{position:absolute;right:0;top:20px;font-size:12px;opacity:.55}.item:hover>.rk-del,.item>.rk-del:focus-visible{opacity:1}`;
+.item{position:relative;padding-right:72px!important}.item>.rk-del{position:absolute;right:8px;top:9px;font-size:12px;opacity:.55}.item:hover>.rk-del,.item>.rk-del:focus-visible{opacity:1}`;
   document.head.append(css);
 
   const link = (src, title, text) => {

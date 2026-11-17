@@ -299,28 +299,29 @@ def make_item(slug, it, site, src):
         q = '<p class="q q-none">질문 원문 미확보</p>'
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in it.get("tags") or [])
     return (f'<article class="item" data-category="{esc(it["category"])}" data-src="{esc(src)}" data-search="{esc(search)}" '
-            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">{head}{q}'
+            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">'
+            f'<span class="item-cat">{esc(site["categories"].get(it["category"], it["category"]))}</span>{head}{q}'
             f'<p class="sum">{esc(it["summary"])}</p>'
             f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
 
 
 def render_home(items, site):
-    """items: (date, order, category, has_question, html). 분야 순서는 site.yml, 분야 안은 최신순."""
+    """items: (date, order, category, has_question, html). 홈은 분야 구분 없이 한 목록(최신순),
+    분야는 왼쪽 세로 목록(site.yml 순서)으로 거른다(사용자 결정 2026-11-17 — ERP식 탭·목록)."""
     esc = html.escape
     items = sorted(items, key=lambda c: (c[0], -c[1]), reverse=True)
     chips = [f'<button class="chip active" data-filter="all">전체 <b>{len(items)}</b></button>']
-    sections = []
+    ncat = 0
     for key, label in site["categories"].items():
-        group = [c for c in items if c[2] == key]
-        if not group:
+        n = sum(1 for c in items if c[2] == key)
+        if not n:
             continue
-        chips.append(f'<button class="chip" data-filter="{esc(key)}">{esc(label)} <b>{len(group)}</b></button>')
-        sections.append(f'<section class="cat" data-section="{esc(key)}"><h2>{esc(label)} <span>{len(group)}</span></h2>'
-                        + "\n".join(c[4] for c in group) + "</section>")
-    stats = (f'글 <b>{len(items)}</b> · 분야 <b>{len(sections)}</b> · '
+        ncat += 1
+        chips.append(f'<button class="chip" data-filter="{esc(key)}">{esc(label)} <b>{n}</b></button>')
+    stats = (f'글 <b>{len(items)}</b> · 분야 <b>{ncat}</b> · '
              f'질문 원문이 있는 글 <b>{sum(1 for c in items if c[3])}</b>')
     return {"<!--INTRO-->": esc(site.get("intro") or ""), "<!--STATS-->": stats,
-            "<!--CHIPS-->": "".join(chips), "<!--SECTIONS-->": "\n".join(sections)}
+            "<!--CHIPS-->": "".join(chips), "<!--ITEMS-->": "\n".join(c[4] for c in items)}
 
 
 def copy_static(out):
