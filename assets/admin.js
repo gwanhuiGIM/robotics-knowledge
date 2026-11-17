@@ -24,7 +24,7 @@
     a.href = `${REPO}/delete/${BRANCH}/${src}`;
     a.title = `GitHub에서 ${src} 삭제 화면 열기 — '${title}'`;
     a.onclick = e => {
-      if (!confirm(`'${title}' 글을 삭제할까요?\n\nGitHub 삭제 화면(${src})이 새 탭으로 열립니다.\n거기서 'Commit changes'를 눌러야 실제로 지워지고, 1~2분 뒤 사이트에 반영됩니다.`)) e.preventDefault();
+      if (!confirm(`'${title}' 글을 삭제할까요?\n\nGitHub 삭제 화면(${src})이 새 탭으로 열립니다.\n거기서 'Commit changes'를 눌러야 실제로 지워지고, GitHub Actions 배포가 끝나면 사이트에 반영됩니다.`)) e.preventDefault();
     };
     return a;
   };
