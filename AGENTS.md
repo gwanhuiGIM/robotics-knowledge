@@ -16,9 +16,9 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 3. Do not silently remove/add claims, invent citations, manipulate original measurements, reconstruct missing sentences as source text, or conflate a recreated visualization with a source image.
 4. Keep original source material separately when feasible. Rendering fixes (semantic headings, tables, LaTeX, code highlighting) may change markup **without changing informational meaning**. If exact restoration is impossible, disclose it.
 5. Treat all GitHub Pages content as **public**. Check for personal information, secrets, proprietary material, credentials, private attachments, and third-party reuse rights before committing.
-6. Preserve the working dark design and features: **category filter (homepage category chips — the left sidebar was replaced by the user's decision on 2026-11-14), keyword search, article links, sticky TOC, back/list/top controls, reading progress, mobile responsive layout**.
+6. Preserve the working dark design and features: **category filter (homepage category chips — the left sidebar was replaced by the user's decision on 2026-11-14), keyword search, article links, sticky TOC, back/list/top controls, reading progress**. Mobile layout is no longer a design target (user's decision on 2026-11-16 — wide desktop layout first); keep existing mobile CSS but do not optimize or test new layout for mobile.
 7. Check duplicates before adding an article (title, topic and source). Do not create multiple cards for the same article; update only if requested or materially necessary.
-8. Do not overwrite unrelated user files, delete existing articles, or reword prior Q&A as a side effect of layout improvements.
+8. Do not overwrite unrelated user files, delete existing articles (except when the user deletes one locally with `tools/preview.py`, user's decision on 2026-11-16), or reword prior Q&A as a side effect of layout improvements.
 9. Distinguish **commit success**, **GitHub Actions deployment success**, and **real rendered/browser behavior**. Do not report unperformed tests as passed.
 10. Prefer smallest reviewable changes, clear commit messages, and a short record of what changed, verification, and remaining uncertainty. For large architectural migration, propose and stage a safe migration rather than destructively rewriting the site.
 

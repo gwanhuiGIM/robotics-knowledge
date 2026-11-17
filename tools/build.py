@@ -324,7 +324,8 @@ def render_home(items, site):
 
 def copy_static(out):
     for item in ROOT.iterdir():
-        if item.name in EXCLUDE_TOP or item.name == out.name or item.name.startswith("."):
+        # '_'로 시작하는 폴더는 빌드 출력·로컬 휴지통(_site, _preview, _trash)이라 배포하지 않는다.
+        if item.name in EXCLUDE_TOP or item.name.startswith((".", "_")):
             continue
         if item.is_file() and item.suffix in EXCLUDE_SUFFIX:
             continue
