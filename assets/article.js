@@ -42,6 +42,26 @@
     if (!window.lucide || !document.querySelector("i[data-lucide]")) return;
     try { window.lucide.createIcons({ icons: window.lucide.icons }); } catch (e) { /* 아이콘만 빠진다 */ }
   }
-  function run() { renderMath(); renderMermaid(); renderIcons(); }
+  function foldNotes() {
+    // 게시 메모(참고·주의)는 원문 답변이 아니라 게시자의 대조·재구성 설명이라 기본으로 접는다.
+    // 마크업만 바꾸고 글자는 그대로 둔다(JS가 없으면 펼친 채로 보인다).
+    document.querySelectorAll(".art-body blockquote.alert-note, .art-body blockquote.alert-warning").forEach(function (bq) {
+      var d = document.createElement("details");
+      d.className = "alert-fold";
+      var s = document.createElement("summary");
+      var b = document.createElement("b");
+      b.textContent = bq.classList.contains("alert-note") ? "참고" : "주의";
+      var first = bq.querySelector("p");
+      var strong = first && first.querySelector("strong");
+      var hint = (strong ? strong.textContent : (first ? first.textContent : "")).replace(/[:：]\s*$/, "").trim();
+      if (hint.length > 48) hint = hint.slice(0, 48) + "…";
+      s.appendChild(b);
+      s.appendChild(document.createTextNode(hint));
+      d.appendChild(s);
+      bq.parentNode.insertBefore(d, bq);
+      d.appendChild(bq);
+    });
+  }
+  function run() { foldNotes(); renderMath(); renderMermaid(); renderIcons(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();

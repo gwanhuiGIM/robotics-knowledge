@@ -9,14 +9,14 @@ body.reader-enabled *{box-sizing:border-box}
 .reader-btn{border:1px solid #4c535c!important;border-radius:8px!important;color:#e3e9ee!important;background:#272d35!important;padding:7px 12px!important;font:inherit!important;font-size:13px!important;cursor:pointer;white-space:nowrap}
 .reader-btn:hover{background:#39414b!important}
 .reader-progress{height:3px;position:fixed;top:64px;left:0;width:0;background:#a9c5d8;z-index:101;transition:width .1s}
-.reader-layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1700px;margin:0 auto;gap:38px;padding:34px clamp(18px,3vw,40px) 100px;align-items:start}
-.reader-main{min-width:0;max-width:1150px;width:100%;margin:auto}
+.reader-layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1340px;margin:0 auto;gap:38px;padding:34px clamp(18px,3vw,40px) 100px;align-items:start}
+.reader-main{min-width:0;max-width:920px;width:100%;margin:0}
 .reader-main>h1,.reader-main header h1{letter-spacing:-.035em;line-height:1.32!important}
 .reader-main h2{scroll-margin-top:94px;line-height:1.45!important;letter-spacing:-.025em}
 .reader-main h3{scroll-margin-top:94px;line-height:1.5!important}
 .reader-main p,.reader-main li,.reader-main .answer,.reader-main .bodytext{line-height:1.9!important}
 .reader-main p{font-size:inherit}
-.reader-main table{display:table;min-width:500px}
+.reader-main table{display:table}
 .reader-main .tablewrap,.reader-main .box{max-width:100%}
 .reader-main pre{overflow-x:auto}
 .reader-main img,.reader-main svg{max-width:100%}
@@ -37,7 +37,7 @@ body.reader-enabled *{box-sizing:border-box}
 
 /* Audit remediation: keep horizontal scrolling inside tables and long mobile TOCs. */
 .reader-table-scroll{max-width:100%;width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin:14px 0}
-.reader-table-scroll table{margin:0;min-width:500px}
+.reader-table-scroll table{margin:0}
 .reader-main{min-width:0;overflow-wrap:anywhere}
 .reader-main .answer,.reader-main .bodytext{min-width:0}
 .reader-main .reader-table-scroll{overflow-wrap:normal}
