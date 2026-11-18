@@ -33,7 +33,7 @@
 ```yaml
 ---
 title: "ROS 2 QoS의 Reliability와 Durability 차이"   # 필수
-category: ROS 2                    # 필수 — tools/site.yml categories 중 하나(ROS 2·Linux·Manufacturing·DevOps·Control·Simulation·Embodied AI). Systems는 2026-11-14에 나뉘어 쓰지 않는다
+category: ROS 2                    # 필수 — tools/site.yml categories 중 하나(ROS 2·Linux·Manufacturing·DevOps·Control·Simulation·Embodied AI·Reels). Systems는 2026-11-14에 나뉘어 쓰지 않는다
 content_mode: new_answer           # 필수 — tools/site.yml content_modes 중 하나 (아래 4절)
 published: 2026-11-07              # 필수 — YYYY-MM-DD
 updated: 2026-11-08                # 선택
