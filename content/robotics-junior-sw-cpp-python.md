@@ -14,7 +14,7 @@ source_note: "ChatGPT 답변 공유 링크(2026-11-19 사용자 제공)에서 �
 > 로보틱스 신입 sw개발 채용의 jd기준, 요구하는 c++ 및 python 개발 능력의 기준, 수준, 기술용어 및 활용사례의 요구 수준이 어느정도일지 궁금해.
 
 > [!NOTE]
-> ChatGPT 답변 공유 링크에서 가져온 원문입니다. 문장·표는 바꾸지 않았습니다. 3절 개념도는 공유 페이지에 들어 있던 SVG 원본을 파일로 옮겼고(어두운 배경에서 보이도록 선·화살표 색만 변경 — 상자와 글자 색은 원본 그대로), 2절 공고 카드(배지·채용공고 링크 포함), 5절 예상 질문 카드(원문은 눌러 펼치는 목록이라 모두 펼친 상태로), 7절 목표 수준 표시(원문의 막대를 등급 배지로)는 화면에 보이는 같은 글자를 레이아웃 태그로 다시 배치했습니다. 7절 단계 카드는 본문 사본의 표기(굵은 제목·구분선)를 따랐고 카드 아이콘은 옮기지 않았습니다. 답변 끝의 후속 질문 제안 목록은 뺐습니다.
+> ChatGPT 답변 공유 링크에서 가져온 원문입니다. 문장·표는 바꾸지 않았습니다. 3절 개념도는 공유 페이지에 들어 있던 SVG 원본을 파일로 옮겼고(어두운 배경에서 보이도록 선·화살표 색만 변경 — 상자와 글자 색은 원본 그대로), 2절 공고 카드(배지·채용공고 링크 포함), 5절 예상 질문 카드(원문은 눌러 펼치는 목록이라 모두 펼친 상태로), 7절 목표 수준 표시(원문의 막대를 등급 배지로)는 화면에 보이는 같은 글자를 레이아웃 태그로 다시 배치했습니다. 7절 단계 카드도 같은 글자를 상자로 다시 배치하고 원문 아이콘(code·activity·git-branch)을 붙였습니다. 2단계 카드의 아이콘(원문 이름 nodes)은 사이트 아이콘 목록(lucide)에 없어 뺐습니다. 답변 끝의 후속 질문 제안 목록은 뺐습니다.
 
 # 로보틱스 신입 SW 개발자에게 요구되는 C++·Python 역량
 
@@ -232,27 +232,35 @@ Python의 경우 특히 **라이브러리를 사용할 수 있는 수준과 라�
 
 제 판단으로는 새로운 로봇 프레임워크를 계속 학습하기보다, 기존 프로젝트 하나를 **C++ 기반의 유지보수 가능한 소프트웨어로 재구현하고 검증하는 것**이 채용 준비에 더 효과적입니다.
 
-**1단계 — C++17 기본기**
-
-STL, 클래스, 포인터, 스마트 포인터, RAII, const correctness, CMake를 학습합니다. 기존 Python 경로추종 알고리즘을 C++로 재구현해 볼 수 있습니다.
-
----
-
-**2단계 — ROS 2 C++ 패키지**
-
-`rclcpp` 기반 Publisher, Subscriber, Timer, Service, Action을 구현하고 Executor, QoS, Callback Group을 이해합니다.
-
----
-
-**3단계 — 성능 측정과 디버깅**
-
-`gdb`, AddressSanitizer, `perf`, ROS 2 tracing 등을 활용해 메모리 오류, CPU 사용률, 처리시간, 지터를 측정합니다.
-
----
-
-**4단계 — 소프트웨어 품질과 협업**
-
-`Git`, `pytest`, `GoogleTest`, CI, 코드 리뷰, README, 재현 가능한 실행 환경을 구축합니다.
+<box gap={2}>
+  <box border radius="lg" padding={3} gap={1}>
+    <row gap={2} align=center>
+      <icon name="code"/>
+      <text weight="semibold">1단계 — C++17 기본기</text>
+    </row>
+    <text>STL, 클래스, 포인터, 스마트 포인터, RAII, const correctness, CMake를 학습합니다. 기존 Python 경로추종 알고리즘을 C++로 재구현해 볼 수 있습니다.</text>
+  </box>
+  <box border radius="lg" padding={3} gap={1}>
+    <row gap={2} align=center>
+      <text weight="semibold">2단계 — ROS 2 C++ 패키지</text>
+    </row>
+    <text>`rclcpp` 기반 Publisher, Subscriber, Timer, Service, Action을 구현하고 Executor, QoS, Callback Group을 이해합니다.</text>
+  </box>
+  <box border radius="lg" padding={3} gap={1}>
+    <row gap={2} align=center>
+      <icon name="activity"/>
+      <text weight="semibold">3단계 — 성능 측정과 디버깅</text>
+    </row>
+    <text>`gdb`, AddressSanitizer, `perf`, ROS 2 tracing 등을 활용해 메모리 오류, CPU 사용률, 처리시간, 지터를 측정합니다.</text>
+  </box>
+  <box border radius="lg" padding={3} gap={1}>
+    <row gap={2} align=center>
+      <icon name="git-branch"/>
+      <text weight="semibold">4단계 — 소프트웨어 품질과 협업</text>
+    </row>
+    <text>`Git`, `pytest`, `GoogleTest`, CI, 코드 리뷰, README, 재현 가능한 실행 환경을 구축합니다.</text>
+  </box>
+</box>
 
 ### 목표 수준 정리
 
