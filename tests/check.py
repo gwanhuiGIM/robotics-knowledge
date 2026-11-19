@@ -4,6 +4,7 @@
 1) 렌더러 단위 시험 — tests/fixtures/visual-sample.md를 렌더해 수식·Mermaid·Alert·표·sanitize를 확인,
    tests/fixtures/layout-sample.md로 ChatGPT 레이아웃 태그(반복·속성 검증·sanitize·원문 표시 대체)를 확인,
    tests/fixtures/widget-sample.md로 ChatGPT 화면 위젯(Entity·Cite·AsyncImage·Chart)을 확인
+   assets/ 아래 SVG 안전 검사(<script>·on* 속성·foreignObject·외부 href 거부)
 2) 사이트 시험(--site) — 홈 카드 href가 모두 존재, 카드 수 = 기존 카드 + 생성 글, 생성 글에 reader 자산 포함
 실패하면 종료 코드 1. 배포를 막지 않으려면 workflow에서 continue-on-error로 둔다.
 """
@@ -210,6 +211,38 @@ def site_check(out):
         check(not (out / bad).exists(), f"배포 제외 대상이 포함됨: {bad}")
 
 
+# 커밋된 SVG 안전 검사(계획 2026-11-18-link-import-simplify B-5). 공유 페이지에서 옮긴 SVG는 <img>로 쓰여 스크립트가
+# 돌지 않지만, 파일을 직접 열면 실행될 수 있어 저장소에 두지 않는다. 같은 기준을 로컬 추출 도구(extract.js)도 쓴다.
+SVG_BAD = [  # 2026-11-19 교차검증: 이름공간 script·<set>·숫자 엔티티·<style> @import 우회를 막으려 허용 쪽으로 좁힘
+    (re.compile(r"<\s*(?:[\w-]+:)?(?:script|foreignObject|iframe|embed|object|style|set|animate\w*|image|handler|listener)\b", re.I), "위험 요소"),
+    (re.compile(r"\son[a-z]+\s*=", re.I), "on* 속성"),
+    (re.compile(r"""href\s*=\s*["']\s*(?!#)""", re.I), "내부(#) 아닌 href"),
+    (re.compile(r"&#"), "숫자 엔티티"),
+    (re.compile(r"""url\(\s*["']?\s*(?!#)""", re.I), "내부(#) 아닌 url()"),
+    (re.compile(r"javascript:", re.I), "javascript:"),
+]
+
+
+def svg_problems(text):
+    return [name for rx, name in SVG_BAD if rx.search(text)]
+
+
+def svg_check():
+    # 검사기가 실제로 잡는지 먼저 본다(변이 4종 + 정상 1종)
+    ok = ('<svg xmlns="http://www.w3.org/2000/svg" style="color:red"><rect x="1" fill="url(#g)"/>'
+          '<use href="#a"/><text font-family="&quot;Segoe UI&quot;">a</text></svg>')
+    check(svg_problems(ok) == [], "SVG 검사 오탐: 정상 SVG")
+    for bad in ('<svg><script>alert(1)</script></svg>', '<svg onload="x()"></svg>',
+                '<svg><foreignObject></foreignObject></svg>', '<svg><image href="https://e.x/a.png"/></svg>',
+                '<svg><s:script>a</s:script></svg>', '<svg><set attributeName="href" to="javascript:x"/></svg>',
+                '<svg><a href="&#106;avascript:x">a</a></svg>', '<svg><style>@import url(https://e.x/a.css)</style></svg>',
+                '<svg><rect fill="url(http://e.x/a)"/></svg>'):
+        check(svg_problems(bad), f"SVG 검사 놓침: {bad}")
+    for p in sorted((ROOT / "assets").rglob("*.svg")):
+        found = svg_problems(p.read_text(encoding="utf-8", errors="replace"))
+        check(not found, f"SVG 안전 검사 실패: {p.relative_to(ROOT)} → {', '.join(found)}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--site")
@@ -217,6 +250,7 @@ def main():
     unit()
     layout_unit()
     widget_unit()
+    svg_check()
     if a.site:
         site_check((ROOT / a.site).resolve())
     for f in fails:
