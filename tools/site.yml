@@ -9,7 +9,7 @@ categories:            # front matter `category` 허용 값 → 화면 라벨 (2
   Control: Robot Control
   Simulation: Simulation
   Embodied AI: Embodied AI
-  Reels: Instagram 릴스      # 2026-11-18 추가 — `/reels` 명령(로컬 Claude Code)으로 릴스를 요약한 글
+  Reels: 영상 요약 (릴스·YouTube)      # 2026-11-18 추가 — `/reels` 명령(로컬 Claude Code)으로 영상을 요약한 글 중 겹치는 분야가 없는 것(2026-11-19 이름 변경)
 
 # 옛 값 → 안내. 이 값으로 쓴 글은 배포에서 빠지고 경고에 새 값 후보가 나온다.
 retired_categories:
