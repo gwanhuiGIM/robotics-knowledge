@@ -140,6 +140,14 @@ python3 -m http.server 8799 --directory _site   # 브라우저로 http://127.0.0
 - 배포 workflow에서도 같은 빌드·검사가 돈다. 글 하나가 규약을 어기면 그 글만 배포에서 빠지고 Actions에 `::warning`이 남는다 — **커밋 성공 ≠ 게시 성공**이므로 Actions 결과와 실제 페이지를 따로 확인한다(AGENTS.md 규칙 9).
 - 중복 확인: 같은 주제·같은 질문의 글이 `content/`나 `tools/legacy_cards.yml`에 이미 있는지 먼저 본다.
 
+### 글 삭제 (사용자만)
+
+- 사이트 주소 끝에 `?admin`을 붙여 한 번 열면 그 브라우저에서 관리 모드가 켜진다(`?admin=off` 또는 왼쪽 아래 "끄기"로 끔). 홈 카드와 글 화면에 **삭제** 버튼이 보인다.
+- 삭제 → 확인 → GitHub의 그 파일 삭제 화면이 새 탭으로 열림 → **Commit changes** → Actions 재배포 뒤 사이트에서 사라진다. 로컬은 `git pull`로 맞춘다.
+- 버튼은 숨김 편의일 뿐 권한이 아니다. 실제 삭제는 GitHub 저장소 쓰기 권한이 있어야 된다.
+- 지워지는 것은 원본 파일 하나다(`content/<slug>.md` 또는 `articles/<slug>.html`). 옛 글의 `tools/legacy_cards.yml` 항목은 남아도 빌드가 홈에서 빼고 `::warning`만 남긴다. `assets/img/<slug>/` 그림도 남는다 — 필요하면 나중에 정리한다. 되돌리기는 GitHub 커밋 기록에서 한다.
+- AI 에이전트는 이 버튼으로 글을 지우지 않는다(AGENTS.md 규칙 8).
+
 ## 8. ChatGPT 프로젝트 지시문에 넣을 포인터
 
 폐지(2026-11-19 사용자 결정 — 2절 4번). ChatGPT 프로젝트 지시문에서 이 저장소에 게시하라는 문구를 지운다. 이전 문구는 git 기록(`git log -p -- docs/AUTHORING.md`)에 있다.

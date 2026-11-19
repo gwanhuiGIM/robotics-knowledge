@@ -9,20 +9,20 @@ body.reader-enabled *{box-sizing:border-box}
 .reader-btn{border:1px solid #4c535c!important;border-radius:8px!important;color:#e3e9ee!important;background:#272d35!important;padding:7px 12px!important;font:inherit!important;font-size:13px!important;cursor:pointer;white-space:nowrap}
 .reader-btn:hover{background:#39414b!important}
 .reader-progress{height:3px;position:fixed;top:64px;left:0;width:0;background:#a9c5d8;z-index:101;transition:width .1s}
-.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 258px;max-width:1340px;margin:0 auto;gap:38px;padding:34px clamp(18px,3vw,40px) 100px;align-items:start}
-.reader-main{min-width:0;max-width:880px;width:100%;margin:auto}
+.reader-layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1340px;margin:0 auto;gap:38px;padding:34px clamp(18px,3vw,40px) 100px;align-items:start}
+.reader-main{min-width:0;max-width:920px;width:100%;margin:0}
 .reader-main>h1,.reader-main header h1{letter-spacing:-.035em;line-height:1.32!important}
 .reader-main h2{scroll-margin-top:94px;line-height:1.45!important;letter-spacing:-.025em}
 .reader-main h3{scroll-margin-top:94px;line-height:1.5!important}
 .reader-main p,.reader-main li,.reader-main .answer,.reader-main .bodytext{line-height:1.9!important}
 .reader-main p{font-size:inherit}
-.reader-main table{display:table;min-width:500px}
+.reader-main table{display:table}
 .reader-main .tablewrap,.reader-main .box{max-width:100%}
 .reader-main pre{overflow-x:auto}
 .reader-main img,.reader-main svg{max-width:100%}
 .reader-main a{overflow-wrap:anywhere}
 .reader-main blockquote{line-height:1.8!important}
-.reader-toc{position:sticky;top:92px;align-self:start;border-left:1px solid var(--reader-border);padding:4px 4px 14px 19px;max-height:calc(100dvh - 115px);overflow-y:auto}
+.reader-toc{order:-1;position:sticky;top:92px;align-self:start;border-right:1px solid var(--reader-border);padding:4px 14px 14px 19px;max-height:calc(100dvh - 115px);overflow-y:auto}
 .reader-toc-label{text-transform:uppercase;letter-spacing:.13em;font-size:11px;color:#8795a3;font-weight:750;margin:8px 0 12px}
 .reader-toc a{display:block;text-decoration:none!important;color:#aeb8c2!important;font-size:13px;line-height:1.55;padding:8px 10px;border-left:2px solid transparent;margin-left:-21px;overflow-wrap:anywhere}
 .reader-toc a[data-level="3"]{padding-left:23px;font-size:12px}
@@ -31,13 +31,13 @@ body.reader-enabled *{box-sizing:border-box}
 .reader-floating .reader-btn{box-shadow:0 4px 20px #0005}
 .reader-mobile-toc{display:none}
 .reader-main .heading{scroll-margin-top:94px}
-@media(max-width:1000px){.reader-layout{grid-template-columns:minmax(0,1fr) 210px;gap:18px}.reader-toc a{font-size:12px}}
+@media(max-width:1000px){.reader-layout{grid-template-columns:210px minmax(0,1fr);gap:18px}.reader-toc a{font-size:12px}}
 @media(max-width:760px){.reader-layout{display:block;padding:22px 17px 90px}.reader-toc{display:none}.reader-mobile-toc{display:block;position:sticky;top:67px;z-index:85;margin:0 0 22px}.reader-mobile-toc summary{cursor:pointer;background:#272d35;border:1px solid #47505b;border-radius:9px;padding:9px 13px;font-size:14px;list-style:none}.reader-mobile-toc[open]{background:#1b1f25;border-radius:9px;border:1px solid #47505b;padding-bottom:10px}.reader-mobile-toc[open] summary{border:0;background:transparent}.reader-mobile-toc a{display:block;color:#cdd7df!important;text-decoration:none!important;padding:7px 14px;font-size:13px}.reader-top{padding:0 14px}.reader-brand{font-size:13px}.reader-actions .reader-btn{font-size:12px;padding:7px 8px!important}.reader-floating{right:12px;bottom:12px}.reader-floating .reader-btn{font-size:12px!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.reader-progress{transition:none}}
 
 /* Audit remediation: keep horizontal scrolling inside tables and long mobile TOCs. */
 .reader-table-scroll{max-width:100%;width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin:14px 0}
-.reader-table-scroll table{margin:0;min-width:500px}
+.reader-table-scroll table{margin:0}
 .reader-main{min-width:0;overflow-wrap:anywhere}
 .reader-main .answer,.reader-main .bodytext{min-width:0}
 .reader-main .reader-table-scroll{overflow-wrap:normal}

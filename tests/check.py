@@ -145,30 +145,33 @@ def site_check(out):
     hrefs = re.findall(r'<a class="item-link" href="([^"]+)"', index)
     items = re.findall(r'<article class="item" data-category="([^"]+)".*?</article>', index, re.S)
     check(len(items) == len(hrefs), f"항목 {len(items)} != 링크 {len(hrefs)}")
-    # 분야 칩 숫자 = 섹션 안 실제 항목 수, 0개 분야 칩 없음
+    # 분야 칩 숫자 = 그 분야 실제 항목 수, 0개 분야 칩 없음. 항목은 모두 #list 한 목록 안(분야 섹션 없음, 2026-11-17)
     site = build.load_site()
     for key in site["categories"]:
         n = items.count(key)
         k = re.escape(build.html.escape(key))
         chip = re.search(r'data-filter="%s">[^<]*<b>(\d+)</b>' % k, index)
-        sec = re.search(r'<section class="cat" data-section="%s">(.*?)</section>' % k, index, re.S)
         if n == 0:
-            check(chip is None and sec is None, f"글 0개 분야가 홈에 나옴: {key}")
+            check(chip is None, f"글 0개 분야가 홈에 나옴: {key}")
         else:
             check(chip is not None and int(chip.group(1)) == n, f"칩 숫자 불일치: {key}")
-            check(sec is not None and sec.group(1).count('<article class="item"') == n, f"섹션 항목 수 불일치: {key}")
-    in_sec = sum(m.count('<article class="item"') for m in re.findall(r'<section class="cat".*?</section>', index, re.S))
-    check(in_sec == len(items), "섹션 밖 항목 있음")
+    lst = re.search(r'<div class="list" id="list">(.*?)<p id="empty"', index, re.S)
+    check(lst is not None and lst.group(1).count('<article class="item"') == len(items), "목록 밖 항목 있음")
+    dates = re.findall(r'<article class="item".*?<time>([^<]+)</time>', index, re.S)
+    check(dates == sorted(dates, reverse=True), "홈 목록이 최신순이 아님")
     total = re.search(r'data-filter="all">[^<]*<b>(\d+)</b>', index)
     check(total is not None and int(total.group(1)) == len(items), "전체 칩 숫자 불일치")
 
+    # GitHub에서 HTML을 지운 옛 글은 빌드가 홈에서 뺀다 — 검사도 HTML이 남은 항목만 센다.
+    live_legacy = [c for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
+                   if (ROOT / "articles" / f"{c['slug']}.html").exists()]
     # 질문이 그 글의 항목 안, 화면의 질문 상자에 순서대로 그대로 있는지(data-q에만 있거나 다른 글로 옮겨지면 실패)
     def shown_in(slug):
         for a in re.findall(r'<article class="item".*?</article>', index, re.S):
             if f'href="articles/{slug}.html"' in a:
                 return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p>', a, re.S)], a
         return None, ""
-    for c in build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"]:
+    for c in live_legacy:
         want = [q if isinstance(q, str) else q["text"] for q in c.get("questions") or []]
         got, a = shown_in(c["slug"])
         check(got == want, f"홈 질문 불일치: {c['slug']}")
@@ -183,7 +186,7 @@ def site_check(out):
         md.render(build.split_front_matter(p.read_text(encoding="utf-8"), p)[1], env)
         got, _ = shown_in(p.stem)
         check(got == (env.get("prompts") or []), f"홈 질문 불일치(content): {p.stem}")
-    legacy = len(build.yaml.safe_load((ROOT / "tools/legacy_cards.yml").read_text(encoding="utf-8"))["cards"])
+    legacy = len(live_legacy)
     content = len(list((ROOT / "content").glob("*.md")))
     check(len(hrefs) == legacy + content, f"카드 수 {len(hrefs)} != 기존 {legacy} + 생성 {content}")
     check(len(hrefs) == len(set(hrefs)), "중복 카드")

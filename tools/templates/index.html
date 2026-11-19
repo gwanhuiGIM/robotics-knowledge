@@ -2,48 +2,59 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Robotics Knowledge Lab | 로보틱스 질문 기록</title>
 <style>
-:root{color-scheme:dark;--bg:#111318;--card:#1a1d23;--line:#33373e;--text:#eceef0;--muted:#a6abb3;--dim:#7e858e;--accent:#9fc3dc;--q:#16232c;--qline:#3c6a86}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px/1.7 system-ui,-apple-system,"Noto Sans KR",sans-serif;color:var(--text)}
-.wrap{max-width:1120px;margin:auto;padding:0 24px}
-.hero{padding-top:56px;padding-bottom:26px}
-.brand{font-size:13px;letter-spacing:2px;color:var(--accent);font-weight:700;text-transform:uppercase}
-h1{font-size:clamp(28px,5vw,40px);line-height:1.25;margin:10px 0 14px;letter-spacing:-.5px}
-.intro{color:var(--muted);font-size:17px;max-width:860px;margin:0 0 18px}
-.stats{color:var(--dim);font-size:14px}.stats b{color:var(--text);font-weight:700}
-.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);padding:14px 0 12px;border-bottom:1px solid var(--line)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{flex:none;white-space:nowrap;border:1px solid var(--line);border-radius:99px;padding:6px 13px;background:var(--card);color:#c3c8cf;font:inherit;font-size:14px;cursor:pointer}
-.chip b{color:var(--dim);font-weight:600;margin-left:3px}.chip:hover{border-color:#6b737c}
-.chip.active{background:#2b3540;border-color:var(--accent);color:#fff}.chip.active b{color:var(--accent)}
-input{width:100%;margin-top:10px;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 14px;font:inherit;font-size:15px}
-.cat{padding-top:34px}.cat[hidden],.item[hidden],#empty[hidden]{display:none!important}
-.cat h2{font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.cat h2 span{color:var(--dim);font-weight:500;margin-left:4px}
-.item{padding:20px 0 22px;border-bottom:1px solid var(--line)}
-.item-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
-.item-link{color:inherit;text-decoration:none}.item-link:hover h3,.item-link:focus h3{text-decoration:underline;text-underline-offset:4px}
-.item h3{font-size:20px;line-height:1.4;margin:0}
-.item-label{font-size:12px;color:var(--dim)}
-.q{margin:10px 0 0;padding:9px 14px 9px 38px;background:var(--q);border-left:3px solid var(--qline);border-radius:0 8px 8px 0;position:relative;color:#d9e4ea}
-.q::before{content:"Q";position:absolute;left:13px;top:8px;font-weight:800;color:var(--accent)}
-.q p{margin:0;white-space:pre-line;overflow-wrap:anywhere}.q-note{display:block;margin-top:3px;font-size:12px;color:var(--dim)}
-.q-none{background:transparent;border-left-color:var(--line);color:var(--dim);font-size:14px}.q-none::before{color:var(--dim)}
-.more-q summary{cursor:pointer;color:var(--accent);font-size:13px;margin:6px 0 0;width:max-content}
-.sum{color:var(--muted);font-size:15px;margin:10px 0 8px}
-.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.tag{font-size:12px;color:#bfc4cd;border:1px solid #474c54;border-radius:99px;padding:2px 9px}
-.meta time{margin-left:auto;font-size:12px;color:var(--dim)}
-.mode{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.3px}.mode-original_qa{background:#1f3a2b;color:#9fdcb5}.mode-new_answer{background:#3a3220;color:#e8cf8f}.mode-reconstructed{background:#3a2430;color:#e7a9c4}
-#empty{color:var(--muted);padding:30px 0}
-footer{font-size:12px;color:var(--dim);padding:40px 0 50px}
-@media(max-width:650px){.wrap{padding:0 16px}.chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}.hero{padding-top:36px}.item h3{font-size:18px}.q{padding-left:32px}.q::before{left:10px}}
+/* 홈: 맨 위 소개(hero) 유지 + 그 아래 왼쪽 세로 분야 목록·오른쪽 한 줄씩 나열하는 목록(ERP식, 사용자 결정 2026-11-17). 모바일은 설계 대상 아님(AGENTS.md 규칙 6). */
+:root{color-scheme:dark;--bg:#111318;--side:#15181d;--card:#1a1d23;--line:#2a2e35;--line2:#3a3f47;--text:#eceef0;--muted:#a6abb3;--dim:#7e858e;--accent:#9fc3dc;--hover:#181c22}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.6 system-ui,-apple-system,"Noto Sans KR",sans-serif;color:var(--text)}
+.hero{padding:44px 32px 26px;border-bottom:1px solid var(--line)}
+.hero .brand{padding:0}.hero h1{font-size:34px;line-height:1.25;margin:10px 0 12px;padding:0;letter-spacing:-.5px}
+.hero .intro{color:var(--muted);font-size:16px;line-height:1.7;max-width:900px;margin:0 0 12px;padding:0}
+.hero .stats{margin:0;padding:0;font-size:13px}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--side);border-right:1px solid var(--line);padding:24px 14px;display:flex;flex-direction:column}
+.brand{font-size:12px;letter-spacing:2px;color:var(--accent);font-weight:700;text-transform:uppercase}
+.side-label{font-size:11px;letter-spacing:1.5px;color:var(--dim);font-weight:700;padding:0 10px;margin:4px 0 6px}
+.chips{display:flex;flex-direction:column;gap:2px}
+.chip{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;border:0;border-left:3px solid transparent;border-radius:0 6px 6px 0;padding:8px 10px;background:none;color:#c3c8cf;font:inherit;font-size:14px;cursor:pointer}
+.chip b{color:var(--dim);font-weight:600;font-size:12px}.chip:hover{background:var(--hover);color:#fff}
+.chip.active{background:#222a33;border-left-color:var(--accent);color:#fff}.chip.active b{color:var(--accent)}
+.stats{color:var(--dim)}.stats b{color:var(--text)}
+.main{min-width:0;padding:20px 32px 60px}
+.top{display:flex;align-items:center;gap:16px;margin-bottom:10px}
+#count{color:var(--dim);font-size:13px;white-space:nowrap}
+input{flex:1;max-width:520px;margin-left:auto;background:var(--card);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 13px;font:inherit;font-size:14px}
+.cols,.item{display:grid;grid-template-columns:150px minmax(220px,1.1fr) minmax(0,2fr) 300px;column-gap:16px;align-items:start}
+.cols{position:sticky;top:0;z-index:2;background:var(--bg);font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--line2)}
+.item{position:relative;padding:10px 12px;border-bottom:1px solid var(--line)}.item:hover{background:var(--hover)}
+.item[hidden],#empty[hidden]{display:none!important}
+.item-cat{grid-column:1;color:var(--accent);font-size:13px;padding-top:2px}
+.item-head{grid-column:2;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;min-width:0}
+.item-link{color:inherit;text-decoration:none}.item-link:hover h3,.item-link:focus h3{text-decoration:underline;text-underline-offset:3px}
+.item h3{font-size:15px;line-height:1.5;margin:0;font-weight:650}
+.item-label{display:none}
+.q{grid-column:3;grid-row:1;margin:0;padding:2px 0 0;color:#b9c2cb;font-size:14px;min-width:0}
+.q p{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+.q-note{display:block;font-size:11.5px;color:var(--dim)}
+.q-none{color:var(--dim)}
+.more-q{grid-column:3;grid-row:2;min-width:0}
+.more-q summary{cursor:pointer;color:var(--accent);font-size:12px;width:max-content}
+.more-q .q{padding-top:4px}.more-q .q p{white-space:pre-line}
+.sum{display:none}
+.meta{grid-column:4;grid-row:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.tag{font-size:11.5px;color:#bfc4cd;border:1px solid #3d424a;border-radius:99px;padding:0 8px}
+.meta time{margin-left:auto;font-size:12.5px;color:var(--dim);padding-left:6px}
+.mode{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 6px;letter-spacing:.3px}.mode-original_qa{background:#1f3a2b;color:#9fdcb5}.mode-new_answer{background:#3a3220;color:#e8cf8f}.mode-reconstructed{background:#3a2430;color:#e7a9c4}
+#empty{color:var(--muted);padding:30px 12px}
+footer{font-size:12px;color:var(--dim);padding:30px 12px 0}
 </style></head><body>
-<header class="wrap hero"><div class="brand">Robotics Knowledge Lab</div><h1>로보틱스 용어, 직접 물어본 기록</h1>
+<header class="hero"><div class="brand">Robotics Knowledge Lab</div><h1>로보틱스 용어, 직접 물어본 기록</h1>
 <p class="intro"><!--INTRO--></p><div class="stats"><!--STATS--></div></header>
-<div class="bar"><div class="wrap"><nav class="chips" aria-label="분야 선택"><!--CHIPS--></nav>
-<input id="q" type="search" placeholder="⌕ 용어, 질문, 키워드, 태그 검색" aria-label="용어·질문·키워드 검색"></div></div>
-<main class="wrap" id="list">
-<!--SECTIONS-->
-<p id="empty" hidden>일치하는 게시 자료가 없습니다.</p></main>
-<footer class="wrap">로보틱스 학습 아카이브 · 제목을 누르면 질문과 답변 전문으로 이동합니다.</footer>
-<script>let cat="all";function filter(){let q=document.getElementById("q").value.trim().toLowerCase(),shown=0;document.querySelectorAll(".item").forEach(a=>{let text=(a.textContent+" "+a.dataset.search+" "+a.dataset.q).toLowerCase(),yes=(cat==="all"||a.dataset.category===cat)&&text.includes(q);a.hidden=!yes;if(yes)shown++});document.querySelectorAll(".cat").forEach(s=>{s.hidden=!s.querySelector(".item:not([hidden])")});document.getElementById("empty").hidden=shown>0}document.querySelector("#q").addEventListener("input",filter);document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{cat=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));filter()}));</script></body></html>
+<div class="app">
+<aside class="side"><div class="side-label">분야</div><nav class="chips" aria-label="분야 선택"><!--CHIPS--></nav></aside>
+<div class="main">
+<div class="top"><span id="count"></span><input id="q" type="search" placeholder="⌕ 용어, 질문, 키워드, 태그 검색" aria-label="용어·질문·키워드 검색"></div>
+<div class="cols" aria-hidden="true"><span>분야</span><span>제목</span><span>질문</span><span>태그 · 날짜</span></div>
+<div class="list" id="list">
+<!--ITEMS-->
+<p id="empty" hidden>일치하는 게시 자료가 없습니다.</p></div>
+<footer>로보틱스 학습 아카이브 · 제목을 누르면 질문과 답변 전문으로 이동합니다.</footer></div></div>
+<script>let cat="all";function filter(){let q=document.getElementById("q").value.trim().toLowerCase(),shown=0;document.querySelectorAll(".item").forEach(a=>{let text=(a.textContent+" "+a.dataset.search+" "+a.dataset.q).toLowerCase(),yes=(cat==="all"||a.dataset.category===cat)&&text.includes(q);a.hidden=!yes;if(yes)shown++});document.getElementById("empty").hidden=shown>0;document.getElementById("count").textContent=shown+"건"}document.querySelector("#q").addEventListener("input",filter);document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{cat=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));filter()}));filter();</script><script defer src="assets/admin.js"></script></body></html>

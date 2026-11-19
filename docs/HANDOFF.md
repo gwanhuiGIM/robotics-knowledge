@@ -42,7 +42,7 @@ Retired. A scheduled task (Robotics Knowledge Lab 게시 자동화) used to read
 
 ### Verification and future collaboration
 - Confirm local git clone, branch and dirty state on the user's machine separately. Remote GitHub inspection cannot verify these.
-- Check category/search empty results, TOC anchors, back/top buttons, mobile widths 360/390/760px, source accuracy, external references, GitHub deployment and actual rendered page.
+- Check category/search empty results, TOC anchors, back/top buttons on desktop widths (mobile is no longer checked — user decision 2026-11-16, AGENTS.md rule 6), source accuracy, external references, GitHub deployment and actual rendered page.
 - Implemented on 2026-11-07 (entry 13): Markdown source files in `content/`, front-matter metadata, shared article/home templates, a build self-check (`tests/check.py`). Still future work: migrating the remaining legacy HTML articles one by one, browser-level regression tests in CI.
 - Site code changes (build, templates, CSS/JS, tests) go through a separate branch/PR; documentation-only changes and article commits go directly to `main` (user decision 2026-11-16; connector commits retired 2026-11-19, entry 16). Refresh current state before writing to shared files, and record verified work plus uncertainties. Never rewrite user Q&A merely to polish layout.
 

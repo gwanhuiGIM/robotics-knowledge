@@ -263,13 +263,14 @@ def render_article(path, md, site, tpl):
     )
     qs = env.get("prompts") or []
     item = make_item(slug, dict(meta, questions=qs, date=meta["published"],
-                                mode=site["content_modes"][meta["content_mode"]]), site)
+                                mode=site["content_modes"][meta["content_mode"]]), site, f"content/{slug}.md")
     return slug, page, (meta["category"], bool(qs), item), meta["published"]
 
 
-def make_item(slug, it, site):
+def make_item(slug, it, site, src):
     """홈 목록 한 항목. legacy(tools/legacy_cards.yml)와 content 글이 같은 함수로 그려진다.
 
+    src: 저장소 안 원본 경로(관리 모드 삭제 버튼이 GitHub 삭제 화면으로 연결할 때 쓴다).
     it: title, summary, category, tags, questions, 선택 label·card_label·mode·content_mode·keywords·jd·search
     <a> 안에 <details>를 둘 수 없어(인터랙티브 중첩) 링크는 제목에만 둔다.
     """
@@ -297,29 +298,30 @@ def make_item(slug, it, site):
     else:
         q = '<p class="q q-none">질문 원문 미확보</p>'
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in it.get("tags") or [])
-    return (f'<article class="item" data-category="{esc(it["category"])}" data-search="{esc(search)}" '
-            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">{head}{q}'
+    return (f'<article class="item" data-category="{esc(it["category"])}" data-src="{esc(src)}" data-search="{esc(search)}" '
+            f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">'
+            f'<span class="item-cat">{esc(site["categories"].get(it["category"], it["category"]))}</span>{head}{q}'
             f'<p class="sum">{esc(it["summary"])}</p>'
             f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
 
 
 def render_home(items, site):
-    """items: (date, order, category, has_question, html). 분야 순서는 site.yml, 분야 안은 최신순."""
+    """items: (date, order, category, has_question, html). 홈은 분야 구분 없이 한 목록(최신순),
+    분야는 왼쪽 세로 목록(site.yml 순서)으로 거른다(사용자 결정 2026-11-17 — ERP식 탭·목록)."""
     esc = html.escape
     items = sorted(items, key=lambda c: (c[0], -c[1]), reverse=True)
     chips = [f'<button class="chip active" data-filter="all">전체 <b>{len(items)}</b></button>']
-    sections = []
+    ncat = 0
     for key, label in site["categories"].items():
-        group = [c for c in items if c[2] == key]
-        if not group:
+        n = sum(1 for c in items if c[2] == key)
+        if not n:
             continue
-        chips.append(f'<button class="chip" data-filter="{esc(key)}">{esc(label)} <b>{len(group)}</b></button>')
-        sections.append(f'<section class="cat" data-section="{esc(key)}"><h2>{esc(label)} <span>{len(group)}</span></h2>'
-                        + "\n".join(c[4] for c in group) + "</section>")
-    stats = (f'글 <b>{len(items)}</b> · 분야 <b>{len(sections)}</b> · '
+        ncat += 1
+        chips.append(f'<button class="chip" data-filter="{esc(key)}">{esc(label)} <b>{n}</b></button>')
+    stats = (f'글 <b>{len(items)}</b> · 분야 <b>{ncat}</b> · '
              f'질문 원문이 있는 글 <b>{sum(1 for c in items if c[3])}</b>')
     return {"<!--INTRO-->": esc(site.get("intro") or ""), "<!--STATS-->": stats,
-            "<!--CHIPS-->": "".join(chips), "<!--SECTIONS-->": "\n".join(sections)}
+            "<!--CHIPS-->": "".join(chips), "<!--ITEMS-->": "\n".join(c[4] for c in items)}
 
 
 def copy_static(out):
@@ -349,9 +351,13 @@ def build(out):
     cards = []  # (date, order, category, has_question, html)
     legacy = yaml.safe_load((TOOLS / "legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
     for i, c in enumerate(legacy):
+        if not (ROOT / "articles" / f"{c['slug']}.html").exists():
+            # GitHub에서 HTML만 지운 옛 글 — 빈 링크 카드를 만들지 않는다(yml 항목은 나중에 정리해도 됨).
+            warn(Path("tools/legacy_cards.yml"), f"{c['slug']}: articles/{c['slug']}.html이 없어 홈에서 뺌(삭제된 글)")
+            continue
         if c["category"] not in site["categories"]:
             raise SystemExit(f"tools/legacy_cards.yml {c['slug']}: category 허용 값 아님 {c['category']!r}")
-        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site)))
+        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site, f"articles/{c['slug']}.html")))
 
     built, failed = [], []
     for path in sorted((ROOT / "content").glob("*.md")):
