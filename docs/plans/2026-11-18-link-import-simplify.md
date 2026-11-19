@@ -1,6 +1,6 @@
 # 게시 경로를 "공유 링크 → Claude 추출"로 바꾸고 GPT 전용 부분 걷어 내기
 
-작성 2026-11-18 12:55 · 개정 2026-11-19 14:11(계획 검증 반영 — devils-advocate 단독, Codex는 사용 한도로 미실행) · 상태: 승인됨(사용자 "q1o" 2026-11-19) · A 완료(d82b89a·a8c3ec3, OPERATIONS 6절 8번만 wide merge 뒤) · B 완료(2026-11-19 15:08 — 도구·`/knowledge` 명령은 로컬 `.claude/`, `tests/check.py` SVG 검사 69c9a22 브랜치 `feat/knowledge-svg-check`, AUTHORING 2절 안내 2899cf0)
+작성 2026-11-18 12:55 · 개정 2026-11-19 14:11(계획 검증 반영 — devils-advocate 단독, Codex는 사용 한도로 미실행) · 상태: 승인됨(사용자 "q1o" 2026-11-19) · A 완료(d82b89a·a8c3ec3, OPERATIONS 6절 8번만 wide merge 뒤) · B 완료(2026-11-19 15:08, 단 B-2의 위젯 JSON 변환은 미구현 — 감지하면 멈추고 손으로 옮김 — 도구·`/knowledge` 명령은 로컬 `.claude/`, `tests/check.py` SVG 검사 69c9a22 브랜치 `feat/knowledge-svg-check`, AUTHORING 2절 안내 2899cf0)
 
 ## 배경
 - 사용자 결정(2026-11-18): 저장소 구조는 유지하고, ChatGPT가 직접 올리는 경로 대신 Claude가 답변 공유 링크에서 원문을 추출해 올린다(사용자 "q3o", 그 전 "직접 올리는데 원문보존이 안된다는 뜻 아닌지").
