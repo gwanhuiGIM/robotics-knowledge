@@ -11,7 +11,7 @@ Site: https://gwanhuigim.github.io/robotics-knowledge/
 
 ## Non-negotiable rules
 
-1. **Explicit publishing intent only.** A question or an idea alone is not authorization to make it public. Publish when the user explicitly requests site publication in the ChatGPT project conversation. The Notion scheduled route was retired by the user's decision on 2026-11-14; do not treat Notion entries as publish requests.
+1. **Explicit publishing intent only.** A question or an idea alone is not authorization to make it public. Publish when the user explicitly requests site publication in a local Claude Code session for this repository, giving a ChatGPT answer share link and the exact question they asked (share links do not contain the question; if it is missing, stop and ask). The ChatGPT GitHub connector route was retired by the user's decision on 2026-11-19 and the Notion scheduled route on 2026-11-14; do not treat connector commits or Notion entries as publish requests. See docs/AUTHORING.md section 2.
 2. **Two content modes.** (a) Existing Q&A: use the complete *actually retrieved* text, preserving sequence and wording; do not paraphrase it as an original. (b) Topic/question-only: write a fresh, technically grounded answer and label it **새로 생성한 답변**. Never claim access to past chat text that was not retrieved.
 3. Do not silently remove/add claims, invent citations, manipulate original measurements, reconstruct missing sentences as source text, or conflate a recreated visualization with a source image.
 4. Keep original source material separately when feasible. Rendering fixes (semantic headings, tables, LaTeX, code highlighting) may change markup **without changing informational meaning**. If exact restoration is impossible, disclose it.
