@@ -213,11 +213,13 @@ def site_check(out):
 
 # 커밋된 SVG 안전 검사(계획 2026-11-18-link-import-simplify B-5). 공유 페이지에서 옮긴 SVG는 <img>로 쓰여 스크립트가
 # 돌지 않지만, 파일을 직접 열면 실행될 수 있어 저장소에 두지 않는다. 같은 기준을 로컬 추출 도구(extract.js)도 쓴다.
-SVG_BAD = [
-    (re.compile(r"<script", re.I), "<script>"),
+SVG_BAD = [  # 2026-11-19 교차검증: 이름공간 script·<set>·숫자 엔티티·<style> @import 우회를 막으려 허용 쪽으로 좁힘
+    (re.compile(r"<\s*(?:[\w-]+:)?(?:script|foreignObject|iframe|embed|object|style|set|animate\w*|image|handler|listener)\b", re.I), "위험 요소"),
     (re.compile(r"\son[a-z]+\s*=", re.I), "on* 속성"),
-    (re.compile(r"<foreignObject", re.I), "foreignObject"),
-    (re.compile(r"""(?:xlink:)?href\s*=\s*["']\s*(?:https?:|javascript:|//)""", re.I), "외부·javascript href"),
+    (re.compile(r"""href\s*=\s*["']\s*(?!#)""", re.I), "내부(#) 아닌 href"),
+    (re.compile(r"&#"), "숫자 엔티티"),
+    (re.compile(r"""url\(\s*["']?\s*(?!#)""", re.I), "내부(#) 아닌 url()"),
+    (re.compile(r"javascript:", re.I), "javascript:"),
 ]
 
 
@@ -227,10 +229,14 @@ def svg_problems(text):
 
 def svg_check():
     # 검사기가 실제로 잡는지 먼저 본다(변이 4종 + 정상 1종)
-    ok = '<svg xmlns="http://www.w3.org/2000/svg"><rect x="1" fill="#fff"/><text>a</text></svg>'
+    ok = ('<svg xmlns="http://www.w3.org/2000/svg" style="color:red"><rect x="1" fill="url(#g)"/>'
+          '<use href="#a"/><text font-family="&quot;Segoe UI&quot;">a</text></svg>')
     check(svg_problems(ok) == [], "SVG 검사 오탐: 정상 SVG")
     for bad in ('<svg><script>alert(1)</script></svg>', '<svg onload="x()"></svg>',
-                '<svg><foreignObject></foreignObject></svg>', '<svg><image href="https://e.x/a.png"/></svg>'):
+                '<svg><foreignObject></foreignObject></svg>', '<svg><image href="https://e.x/a.png"/></svg>',
+                '<svg><s:script>a</s:script></svg>', '<svg><set attributeName="href" to="javascript:x"/></svg>',
+                '<svg><a href="&#106;avascript:x">a</a></svg>', '<svg><style>@import url(https://e.x/a.css)</style></svg>',
+                '<svg><rect fill="url(http://e.x/a)"/></svg>'):
         check(svg_problems(bad), f"SVG 검사 놓침: {bad}")
     for p in sorted((ROOT / "assets").rglob("*.svg")):
         found = svg_problems(p.read_text(encoding="utf-8", errors="replace"))
