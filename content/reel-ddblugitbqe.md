@@ -20,7 +20,7 @@ source_note: "출처: Instagram @codewithnishchal 릴스(2026-09-08) https://www
 > "Focus on learning computer science first not the specialisation."
 > "When your problem-solving skills get strong, you can grind anything you want later on."
 
-**1. CSE 세부 전공 (0:00~0:27)** — 가운데 `CSE` 노드에서 `CSE + AI`, `CSE + Data Science`, `CSE + Cyber security`, `CSE + Cloud Computing`, `CSE + IOT`, `CSE + Big Data`, `Information Technology` 일곱 갈래가 뻗어 있고, 화자가 각 갈래에 밑줄과 괄호를 그어 묶습니다. 캡션의 "specialisation"이 이 갈래들에 해당하는 것으로 보입니다(음성 미확인).
+**1. CSE 세부 전공 (0:00~0:27)** — 가운데 `CSE` 노드에서 `CSE + AI`, `CSE + Data Science`, `CSE + Cyber security`, `CSE + Cloud Computing`, `CSE + IOT`, `CSE + Big Data`, `Information Technology` 일곱 갈래가 뻗어 있고, 화자가 각 갈래에 밑줄과 괄호를 긋습니다. 캡션의 "specialisation"이 이 갈래들에 해당하는 것으로 보입니다(음성 미확인).
 
 ![CSE에서 일곱 세부 전공으로 갈라지는 마인드맵 — 출처 @codewithnishchal 릴스 장면 캡처](../assets/img/reel-ddblugitbqe/scene1.jpg)
 <text color="secondary" size="xs">출처: @codewithnishchal · https://www.instagram.com/reel/DdBlUGiTBqe/ · 0:02 장면</text>
