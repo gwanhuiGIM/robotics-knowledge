@@ -7,7 +7,7 @@
 | 대상 | 위치 | 비고 |
 |---|---|---|
 | 글 원본 | `content/<slug>.md` | slug = 소문자·숫자·하이픈. 게시 URL은 `articles/<slug>.html` |
-| 그림 파일 | `assets/img/<slug>/<이름>.png·svg` | 본문에서 `../assets/img/<slug>/<이름>.png`로 참조 |
+| 그림 파일 | `assets/img/<slug>/<이름>.png·svg`(`/reels` 장면 캡처는 `.jpg`) | 본문에서 `../assets/img/<slug>/<이름>.png`로 참조 |
 | 홈 카드 | **쓰지 않는다** | 배포할 때 front matter로 자동 생성된다 |
 
 - `index.html`은 더 이상 저장소 루트에 없다. 홈은 `tools/templates/index.html` + 각 글 front matter로 빌드된다. 기존 HTML 글(`articles/*.html`)의 카드는 `tools/legacy_cards.yml`에 원문 그대로 보존돼 있다.

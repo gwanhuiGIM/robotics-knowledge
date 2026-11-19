@@ -31,7 +31,7 @@
 
 ### 공유 링크 → 로컬 Claude Code — 게시 (2026-11-19부터)
 
-사용자가 이 저장소의 Claude Code 세션에 ChatGPT 답변 공유 링크, 명시적 게시 요청, ChatGPT에 입력한 질문 원문을 준다. 절차와 확인 항목은 [AUTHORING.md](AUTHORING.md) 2절 1번. 질문 원문이 없거나 링크를 열 수 없으면 게시를 멈추고 확인한다. 같은 저장소 세션에서 질문·주제만 주고 게시를 요청하면 새로 작성한 답변(`new_answer`, AGENTS.md 규칙 2b)으로, Instagram 릴스는 `/reels` 명령(분야 `Reels`)으로 게시한다.
+사용자가 이 저장소의 Claude Code 세션에 ChatGPT 답변 공유 링크, 명시적 게시 요청, ChatGPT에 입력한 질문 원문을 준다. 절차와 확인 항목은 [AUTHORING.md](AUTHORING.md) 2절 1번. 질문 원문이 없거나 링크를 열 수 없으면 게시를 멈추고 확인한다. 같은 저장소 세션에서 질문·주제만 주고 게시를 요청하면 새로 작성한 답변(`new_answer`, AGENTS.md 규칙 2b)으로, 영상 요약(Instagram 릴스·YouTube, 관련 GitHub·arXiv 주소 포함)은 `/reels` 명령으로 게시한다 — 분야는 키워드가 겹치는 기존 분야, 없으면 `Reels`(AGENTS.md 규칙 1).
 
 원칙:
 
