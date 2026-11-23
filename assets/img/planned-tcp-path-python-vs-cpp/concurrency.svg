@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 480" width="100%" font-family="system-ui, -apple-system, 'Noto Sans KR', sans-serif">
+  <rect x="1" y="1" width="518" height="478" rx="10" fill="#12191f" stroke="#2c3946"/>
+
+  <!-- no lock -->
+  <text x="20" y="30" font-size="13" font-weight="700" fill="#6fa6ea">lock 없음 (Python을 MT executor로 돌린다면)</text>
+  <text x="20" y="68" font-size="11.5" fill="#93a2b1">스레드 A</text>
+  <text x="20" y="112" font-size="11.5" fill="#93a2b1">스레드 B</text>
+  <rect x="90" y="50" width="118" height="28" rx="4" fill="#172a40" stroke="#6fa6ea"/><text x="149" y="68" text-anchor="middle" font-size="11" fill="#e3e9ef">gen 1 == 1 ✓</text>
+  <rect x="218" y="94" width="132" height="28" rx="4" fill="#1c2630" stroke="#8a99a8"/><text x="284" y="112" text-anchor="middle" font-size="11" fill="#e3e9ef">새 plan: gen → 2</text>
+  <rect x="360" y="50" width="120" height="28" rx="4" fill="#3a2814" stroke="#f0a050"/><text x="420" y="68" text-anchor="middle" font-size="11" fill="#e3e9ef">옛 선 발행</text>
+  <line x1="90" y1="140" x2="480" y2="140" stroke="#5a6b7c"/>
+  <text x="480" y="155" text-anchor="end" font-size="10.5" fill="#93a2b1">시간 →</text>
+  <text x="20" y="180" font-size="11.5" fill="#e3e9ef">검사와 행동 사이에 끼어들기(check-then-act).</text>
+  <text x="20" y="198" font-size="11.5" fill="#e3e9ef"><tspan font-family="ui-monospace, 'DejaVu Sans Mono', monospace">pending[0] -= 1</tspan>도 읽기·쓰기 두 단계라 GIL로 원자적이지 않음</text>
+  <text x="20" y="216" font-size="11.5" fill="#93a2b1">→ 발행 누락·중복, 옛 선이 잠깐 보였다가 덮이는 현상 가능</text>
+
+  <line x1="20" y1="236" x2="500" y2="236" stroke="#2c3946"/>
+
+  <!-- mutex -->
+  <text x="20" y="266" font-size="13" font-weight="700" fill="#b98ae6">std::mutex 임계구역 (C++)</text>
+  <text x="20" y="304" font-size="11.5" fill="#93a2b1">스레드 A</text>
+  <text x="20" y="348" font-size="11.5" fill="#93a2b1">스레드 B</text>
+  <rect x="90" y="286" width="290" height="28" rx="4" fill="#2a1d3a" stroke="#b98ae6"/><text x="235" y="304" text-anchor="middle" font-size="11" fill="#e3e9ef">lock: 검사 → 기록 → pending-- → 발행</text>
+  <rect x="150" y="330" width="230" height="28" rx="4" fill="none" stroke="#8a99a8" stroke-dasharray="4 3"/><text x="265" y="348" text-anchor="middle" font-size="11" fill="#93a2b1">lock 대기</text>
+  <rect x="386" y="330" width="94" height="28" rx="4" fill="#1c2630" stroke="#8a99a8"/><text x="433" y="348" text-anchor="middle" font-size="11" fill="#e3e9ef">gen → 2</text>
+  <line x1="90" y1="376" x2="480" y2="376" stroke="#5a6b7c"/>
+  <text x="480" y="391" text-anchor="end" font-size="10.5" fill="#93a2b1">시간 →</text>
+  <text x="20" y="416" font-size="11.5" fill="#e3e9ef">새 generation은 옛 콜백이 끝난 뒤에만 올라감.</text>
+  <text x="20" y="434" font-size="11.5" fill="#e3e9ef">불변식: 옛 결과 섞임 없음 · 발행자 정확히 1 · gen 증가 후 옛 선 없음</text>
+  <text x="20" y="452" font-size="11.5" fill="#93a2b1">대가: publish까지 lock 안에서 하므로 임계구역이 조금 길다</text>
+</svg>
