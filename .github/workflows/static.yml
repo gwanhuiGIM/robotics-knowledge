@@ -26,7 +26,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,4 +52,13 @@ jobs:
           path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
+        # 업로드 직후 "Found 0 artifact(s)"로 간헐 실패(actions/deploy-pages#451, 2026-11 빈발). 실패하면 30초 뒤 한 번 더 시도한다.
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - name: Wait before retry
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 30
+      - name: Deploy to GitHub Pages (retry)
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
