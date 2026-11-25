@@ -26,7 +26,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url || steps.deployment_retry2.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,14 +52,29 @@ jobs:
           path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
-        # 업로드 직후 "Found 0 artifact(s)"로 간헐 실패(actions/deploy-pages#451). 실패하면 30초 뒤 한 번 더 시도한다.
+        # 업로드 직후 "Found 0 artifact(s)"로 간헐 실패(actions/deploy-pages#451). 실패하면 30초·60초 뒤 최대 두 번 더 시도한다.
         # page_url은 deployment 생성 뒤에야 출력되므로, 비어 있을 때(생성 전 실패 — artifact 조회 등)만 재시도해 중복 deployment를 피한다.
         continue-on-error: true
         uses: actions/deploy-pages@v5
-      - name: Wait before retry
+      - name: Wait before retry 1
         if: steps.deployment.outcome == 'failure' && steps.deployment.outputs.page_url == ''
         run: sleep 30
-      - name: Deploy to GitHub Pages (retry)
+      - name: Deploy to GitHub Pages (retry 1)
         id: deployment_retry
         if: steps.deployment.outcome == 'failure' && steps.deployment.outputs.page_url == ''
+        continue-on-error: true
         uses: actions/deploy-pages@v5
+      - name: Wait before retry 2
+        if: steps.deployment_retry.outcome == 'failure' && steps.deployment_retry.outputs.page_url == ''
+        run: sleep 60
+      - name: Deploy to GitHub Pages (retry 2)
+        id: deployment_retry2
+        if: steps.deployment_retry.outcome == 'failure' && steps.deployment_retry.outputs.page_url == ''
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - name: Fail if no deploy attempt succeeded
+        # 위 단계들은 continue-on-error라 실패해도 job이 성공으로 끝나므로, 어느 시도도 성공하지 않았으면 여기서 실패시킨다.
+        if: steps.deployment.outcome != 'success' && steps.deployment_retry.outcome != 'success' && steps.deployment_retry2.outcome != 'success'
+        run: |
+          echo "::error::GitHub Pages 배포가 모든 시도에서 실패했습니다"
+          exit 1
