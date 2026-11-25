@@ -283,10 +283,10 @@ def make_item(slug, it, site, src):
     qs = [(q, "") if isinstance(q, str) else (q["text"], q.get("note") or "") for q in it.get("questions") or []]
 
     def qbox(text, note):
-        return (f'<blockquote class="q"><p>{esc(text)}</p>'
+        return (f'<blockquote class="q"><p title="{esc(text)}">{esc(text)}</p>'
                 + (f'<small class="q-note">{esc(note)}</small>' if note else "") + "</blockquote>")
     href = f"articles/{slug}.html"
-    head = (f'<div class="item-head"><a class="item-link" href="{href}"><h3>{esc(it["title"])}</h3></a>'
+    head = (f'<div class="item-head"><a class="item-link" href="{href}"><h3 title="{esc(it["title"])}">{esc(it["title"])}</h3></a>'
             + (f'<span class="item-label">{esc(label)}</span>' if label else "")
             + (f'<span class="mode mode-{esc(it["content_mode"])}">{esc(it["mode"])}</span>' if it.get("mode") else "")
             + "</div>")
@@ -302,7 +302,7 @@ def make_item(slug, it, site, src):
             f'data-q="{esc(" ".join(t for t, _ in qs).lower())}">'
             f'<span class="item-cat">{esc(site["categories"].get(it["category"], it["category"]))}</span>{head}{q}'
             f'<p class="sum">{esc(it["summary"])}</p>'
-            f'<div class="meta">{tags}<time>{esc(str(it["date"]))}</time></div></article>')
+            f'<div class="meta"><span class="tags" title="{esc(" · ".join(it.get("tags") or []))}">{tags}</span><time>{esc(str(it["date"]))}</time></div></article>')
 
 
 def render_home(items, site):

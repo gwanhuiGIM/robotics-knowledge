@@ -57,7 +57,7 @@ def unit():
           "링크는 제목에만(<a> 안에 <details> 금지)")
     # [!PROMPT] → 홈 질문: 순서·여러 문단·escape, 코드 블록 안 예시와 NOTE는 제외
     _, _, (_, has_q, item), _ = build.render_article(ROOT / "tests/fixtures/prompt-sample.md", md, site, tpl)
-    qs = re.findall(r'<blockquote class="q"><p>(.*?)</p></blockquote>', item, re.S)
+    qs = re.findall(r'<blockquote class="q"><p[^>]*>(.*?)</p></blockquote>', item, re.S)
     check(has_q and qs == ["첫 질문 &amp; &lt;꺾쇠&gt;", "두 번째 질문 첫 문단\n\n두 번째 질문 둘째 문단",
                            "이 코드 설명해줘\n\nprint(1)"], f"질문 추출(질문 안 코드 포함): {qs}")
     check("질문 2개 더 보기" in item and "코드 블록 안" not in item and "참고는" not in item, "질문 추출 범위")
@@ -170,7 +170,7 @@ def site_check(out):
     def shown_in(slug):
         for a in re.findall(r'<article class="item".*?</article>', index, re.S):
             if f'href="articles/{slug}.html"' in a:
-                return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p>(.*?)</p>', a, re.S)], a
+                return [build.html.unescape(q) for q in re.findall(r'<blockquote class="q"><p[^>]*>(.*?)</p>', a, re.S)], a
         return None, ""
     for c in live_legacy:
         want = [q if isinstance(q, str) else q["text"] for q in c.get("questions") or []]
