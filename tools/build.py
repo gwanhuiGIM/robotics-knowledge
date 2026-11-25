@@ -284,7 +284,7 @@ def make_item(slug, it, site, src):
 
     def qbox(text, note):
         return (f'<blockquote class="q"><p title="{esc(text)}">{esc(text)}</p>'
-                + (f'<small class="q-note">{esc(note)}</small>' if note else "") + "</blockquote>")
+                + (f'<small class="q-note" title="{esc(note)}">{esc(note)}</small>' if note else "") + "</blockquote>")
     href = f"articles/{slug}.html"
     head = (f'<div class="item-head"><a class="item-link" href="{href}"><h3 title="{esc(it["title"])}">{esc(it["title"])}</h3></a>'
             + (f'<span class="item-label">{esc(label)}</span>' if label else "")
