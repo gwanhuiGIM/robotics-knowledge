@@ -23,7 +23,8 @@ content_modes:         # front matter `content_mode` 허용 값 → 화면 라�
 required_fields: [title, category, content_mode, published, summary]
 
 # 홈 목록 맨 위에 이 순서로 고정할 글 slug(나머지는 최신순). 분야를 누르면 그 분야 안에서도 이 글들이 먼저 보인다.
-# 2026-11-27 사용자 — 인사담당자가 보기에 보완·학습이 필요해 보일 역량(C++·동시성·품질/협업) 순.
+# 2026-11-27 기준은 사용자("인사담당자 입장에서 … 부족한 역량 또는 공부했으면 좋다고 생각할만한"), 글 3개와 순서는
+# Claude가 robotics-junior-sw-cpp-python 6·7절(C++ 평가 보류·동시성 추가 검증 필요·품질/협업)을 근거로 고름.
 home_top:
   - robotics-junior-sw-cpp-python
   - python-ros2-multithreading
