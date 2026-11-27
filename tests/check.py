@@ -158,8 +158,11 @@ def site_check(out):
             check(chip is not None and int(chip.group(1)) == n, f"칩 숫자 불일치: {key}")
     lst = re.search(r'<div class="list" id="list">(.*?)<p id="empty"', index, re.S)
     check(lst is not None and lst.group(1).count('<article class="item"') == len(items), "목록 밖 항목 있음")
-    dates = re.findall(r'<article class="item".*?<time>([^<]+)</time>', index, re.S)
-    check(dates == sorted(dates, reverse=True), "홈 목록이 최신순이 아님")
+    rows = re.findall(r'<article class="item".*?href="articles/([^"]+)\.html".*?<time>([^<]+)</time>', index, re.S)
+    top = [s for s in site.get("home_top") or [] if any(r[0] == s for r in rows)]
+    check([r[0] for r in rows[:len(top)]] == top, "홈 맨 위가 site.yml home_top 순서가 아님")
+    dates = [r[1] for r in rows[len(top):]]
+    check(dates == sorted(dates, reverse=True), "홈 목록(home_top 아래)이 최신순이 아님")
     total = re.search(r'data-filter="all">[^<]*<b>(\d+)</b>', index)
     check(total is not None and int(total.group(1)) == len(items), "전체 칩 숫자 불일치")
 

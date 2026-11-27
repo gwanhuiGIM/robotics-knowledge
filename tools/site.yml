@@ -22,5 +22,12 @@ content_modes:         # front matter `content_mode` 허용 값 → 화면 라�
 
 required_fields: [title, category, content_mode, published, summary]
 
+# 홈 목록 맨 위에 이 순서로 고정할 글 slug(나머지는 최신순). 분야를 누르면 그 분야 안에서도 이 글들이 먼저 보인다.
+# 2026-11-27 사용자 — 인사담당자가 보기에 보완·학습이 필요해 보일 역량(C++·동시성·품질/협업) 순.
+home_top:
+  - robotics-junior-sw-cpp-python
+  - python-ros2-multithreading
+  - devops-cicd-github-release
+
 # 홈 맨 위 소개글(공개 문구)
 intro: "채용공고(JD)와 산업 현장에서 마주친 로보틱스 용어를 ChatGPT에 직접 묻고, 그 질문과 답변을 정리해 둔 학습 기록입니다. 분야별로 어떤 용어에 대해 무엇을 물었는지 먼저 보이고, 제목을 누르면 답변 전문으로 이동합니다."

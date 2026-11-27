@@ -306,10 +306,16 @@ def make_item(slug, it, site, src):
 
 
 def render_home(items, site):
-    """items: (date, order, category, has_question, html). 홈은 분야 구분 없이 한 목록(최신순),
-    분야는 왼쪽 세로 목록(site.yml 순서)으로 거른다(사용자 결정 2026-11-17 — ERP식 탭·목록)."""
+    """items: (date, order, category, has_question, html, slug). 홈은 분야 구분 없이 한 목록(최신순),
+    분야는 왼쪽 세로 목록(site.yml 순서)으로 거른다(사용자 결정 2026-11-17 — ERP식 탭·목록).
+    site.yml home_top의 글은 그 순서대로 맨 위에 둔다(페이지를 열었을 때 보이는 정렬, 사용자 2026-11-27)."""
     esc = html.escape
     items = sorted(items, key=lambda c: (c[0], -c[1]), reverse=True)
+    top = list(site.get("home_top") or [])
+    for s in top:
+        if not any(c[5] == s for c in items):
+            warn(Path("tools/site.yml"), f"home_top {s!r}: 해당 글이 없어 무시함")
+    items.sort(key=lambda c: top.index(c[5]) if c[5] in top else len(top))  # 안정 정렬 — 나머지는 최신순 유지
     chips = [f'<button class="chip active" data-filter="all">전체 <b>{len(items)}</b></button>']
     ncat = 0
     for key, label in site["categories"].items():
@@ -348,7 +354,7 @@ def build(out):
     copy_static(out)
     (out / "articles").mkdir(exist_ok=True)
 
-    cards = []  # (date, order, category, has_question, html)
+    cards = []  # (date, order, category, has_question, html, slug)
     legacy = yaml.safe_load((TOOLS / "legacy_cards.yml").read_text(encoding="utf-8"))["cards"]
     for i, c in enumerate(legacy):
         if not (ROOT / "articles" / f"{c['slug']}.html").exists():
@@ -357,7 +363,7 @@ def build(out):
             continue
         if c["category"] not in site["categories"]:
             raise SystemExit(f"tools/legacy_cards.yml {c['slug']}: category 허용 값 아님 {c['category']!r}")
-        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site, f"articles/{c['slug']}.html")))
+        cards.append((str(c["date"]), i, c["category"], bool(c.get("questions")), make_item(c["slug"], c, site, f"articles/{c['slug']}.html"), c["slug"]))
 
     built, failed = [], []
     for path in sorted((ROOT / "content").glob("*.md")):
@@ -367,7 +373,7 @@ def build(out):
             if (ROOT / "articles" / f"{slug}.html").exists():
                 raise ArticleError(f"articles/{slug}.html(legacy)과 이름이 겹칩니다")
             (out / "articles" / f"{slug}.html").write_text(page, encoding="utf-8")
-            cards.append((str(published), len(cards), *card))
+            cards.append((str(published), len(cards), *card, slug))
             built.append(str(rel))
         except Exception as e:  # 글 하나의 실패가 사이트 전체 배포를 막지 않게 한다
             warn(rel, f"이 글은 배포에서 제외됨 — {e}")
